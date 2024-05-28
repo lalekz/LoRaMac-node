@@ -52,8 +52,6 @@ set(CMAKE_C_FLAGS_DEBUG -DDEBUG)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/cfg
-    ${CMAKE_CURRENT_SOURCE_DIR}/../mcu
-    ${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601
     ${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/platform/system
     ${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/platform/CMSIS
     ${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/drivers/peripheral/inc/

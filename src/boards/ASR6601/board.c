@@ -5,9 +5,6 @@
 #include "tremo_delay.h"
 
 void BoardInitMcu(){ 
-  //used default system configuration
-}
-void BoardInitPeriph(void){
   uart_config_t uart_config_var;
   //init GPIO
   rcc_enable_peripheral_clk(RCC_PERIPHERAL_GPIOB, true); 
@@ -21,4 +18,7 @@ void BoardInitPeriph(void){
   uart_cmd(UART0, ENABLE);
   //init SysTick for delay
   delay_init();
+}
+void BoardInitPeriph(void){
+  
 }
