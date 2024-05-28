@@ -4,6 +4,7 @@
 #include "tremo_gpio.h"
 #include "tremo_regs.h"
 #include "tremo_delay.h"
+#include "tremo_rtc.h"
 #include "radio.h"
 #include "sx126x-board.h"
 
@@ -27,7 +28,7 @@ void BoardEnableIrq( void )
     __enable_irq();
 }
 
-uint16_t SpiInOut( uint16_t outData )
+uint16_t SspIO(uint16_t outData )
 {
     uint8_t read_data = 0;
     
@@ -51,14 +52,14 @@ void SX126xLoracInit()
     rcc_rst_peripheral(RCC_PERIPHERAL_LORA, false);
     rcc_enable_peripheral_clk(RCC_PERIPHERAL_LORA, true);
 
-    LORAC->CR0 = 0x00000200;
+    LORAC->CR0 = 0x00000200; //pins for RF TRx from internal SSP 
 
-    LORAC->SSP_CR0 = 0x07;
-    LORAC->SSP_CPSR = 0x02;
+    LORAC->SSP_CR0 = 0x07; //8 bit data width
+    LORAC->SSP_CPSR = 0x02; //Fsspclkout prescaler = 2
 
     //wakeup lora 
     //avoid always waiting busy after main reset or soft reset
-    if(LORAC->CR1 != 0x80)
+    if(LORAC->CR1 != 0x80) //select / deselect if not POR_BAT
     {
         delay_us(20);
         LORAC->NSS_CR = 0;
@@ -66,7 +67,7 @@ void SX126xLoracInit()
         LORAC->NSS_CR = 1;
     }
 
-    LORAC->SSP_CR1 = 0x02;
+    LORAC->SSP_CR1 = 0x02; //enable CLK_32M_EN_BAT
     
     NVIC_EnableIRQ(LORA_IRQn);
     //NVIC_SetPriority(LORAC_IRQn, 2);
@@ -108,8 +109,8 @@ void SX126xWakeup( void )
     LORAC->NSS_CR = 0;
     delay_us(20);
 
-    SpiInOut( RADIO_GET_STATUS );
-    SpiInOut( 0x00 );
+    SspIO( RADIO_GET_STATUS );
+    SspIO( 0x00 );
 
     LORAC->NSS_CR = 1;
 
@@ -125,11 +126,11 @@ void SX126xWriteCommand( RadioCommands_t command, uint8_t *buffer, uint16_t size
 
     LORAC->NSS_CR = 0;
 
-    SpiInOut( ( uint8_t )command );
+    SspIO( ( uint8_t )command );
 
     for( uint16_t i = 0; i < size; i++ )
     {
-        SpiInOut( buffer[i] );
+        SspIO( buffer[i] );
     }
 
     LORAC->NSS_CR = 1;
@@ -140,22 +141,23 @@ void SX126xWriteCommand( RadioCommands_t command, uint8_t *buffer, uint16_t size
     }
 }
 
-void SX126xReadCommand( RadioCommands_t command, uint8_t *buffer, uint16_t size )
+uint8_t SX126xReadCommand( RadioCommands_t command, uint8_t *buffer, uint16_t size )
 {
     SX126xCheckDeviceReady( );
 
     LORAC->NSS_CR = 0;
 
-    SpiInOut( ( uint8_t )command );
-    SpiInOut( 0x00 );
+    SspIO( ( uint8_t )command );
+    SspIO( 0x00 );
     for( uint16_t i = 0; i < size; i++ )
     {
-        buffer[i] = SpiInOut( 0 );
+        buffer[i] = SspIO( 0 );
     }
 
     LORAC->NSS_CR = 1;
 
     SX126xWaitOnBusy( );
+    return 0;
 }
 
 void SX126xWriteRegisters( uint16_t address, uint8_t *buffer, uint16_t size )
@@ -164,13 +166,13 @@ void SX126xWriteRegisters( uint16_t address, uint8_t *buffer, uint16_t size )
 
     LORAC->NSS_CR = 0;
     
-    SpiInOut( RADIO_WRITE_REGISTER );
-    SpiInOut( ( address & 0xFF00 ) >> 8 );
-    SpiInOut( address & 0x00FF );
+    SspIO( RADIO_WRITE_REGISTER );
+    SspIO( ( address & 0xFF00 ) >> 8 );
+    SspIO( address & 0x00FF );
     
     for( uint16_t i = 0; i < size; i++ )
     {
-        SpiInOut( buffer[i] );
+        SspIO( buffer[i] );
     }
 
     LORAC->NSS_CR = 1;
@@ -189,13 +191,13 @@ void SX126xReadRegisters( uint16_t address, uint8_t *buffer, uint16_t size )
 
     LORAC->NSS_CR = 0;
 
-    SpiInOut( RADIO_READ_REGISTER );
-    SpiInOut( ( address & 0xFF00 ) >> 8 );
-    SpiInOut( address & 0x00FF );
-    SpiInOut( 0 );
+    SspIO( RADIO_READ_REGISTER );
+    SspIO( ( address & 0xFF00 ) >> 8 );
+    SspIO( address & 0x00FF );
+    SspIO( 0 );
     for( uint16_t i = 0; i < size; i++ )
     {
-        buffer[i] = SpiInOut( 0 );
+        buffer[i] = SspIO( 0 );
     }
     LORAC->NSS_CR = 1;
 
@@ -215,11 +217,11 @@ void SX126xWriteBuffer( uint8_t offset, uint8_t *buffer, uint8_t size )
 
     LORAC->NSS_CR = 0;
 
-    SpiInOut( RADIO_WRITE_BUFFER );
-    SpiInOut( offset );
+    SspIO( RADIO_WRITE_BUFFER );
+    SspIO( offset );
     for( uint16_t i = 0; i < size; i++ )
     {
-        SpiInOut( buffer[i] );
+        SspIO( buffer[i] );
     }
     LORAC->NSS_CR = 1;
 
@@ -232,12 +234,12 @@ void SX126xReadBuffer( uint8_t offset, uint8_t *buffer, uint8_t size )
 
     LORAC->NSS_CR = 0;
 
-    SpiInOut( RADIO_READ_BUFFER );
-    SpiInOut( offset );
-    SpiInOut( 0 );
+    SspIO( RADIO_READ_BUFFER );
+    SspIO( offset );
+    SspIO( 0 );
     for( uint16_t i = 0; i < size; i++ )
     {
-        buffer[i] = SpiInOut( 0 );
+        buffer[i] = SspIO( 0 );
     }
     LORAC->NSS_CR = 1;
     
@@ -280,4 +282,32 @@ void SX126xSetPaOpt( uint8_t opt )
     if(opt>3) return;
     
     gPaOptSetting = opt;
+}
+
+uint32_t SX126xGetDio1PinState() {
+
+}
+
+void SX126xSetOperatingMode(RadioOperatingModes_t mode) {
+
+}
+
+RadioOperatingModes_t SX126xGetOperatingMode() {
+
+}
+
+void SX126xIoTcxoInit() {
+
+}
+
+void SX126xIoRfSwitchInit() {
+
+}
+
+void SX126xIoIrqInit(DioIrqHandler dioIrq) {
+
+}
+
+uint8_t SX126xGetDeviceId() {
+
 }

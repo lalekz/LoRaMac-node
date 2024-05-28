@@ -28,7 +28,9 @@ list(APPEND ${PROJECT_NAME}_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/board.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/delay-board.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/rtc-board.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/gpio-board.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/sx126x-board.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lpm-board.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/cfg/tremo_it.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/../mcu/utilities.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/platform/system/printf-stdarg.c"
@@ -39,6 +41,7 @@ list(APPEND ${PROJECT_NAME}_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/drivers/peripheral/src/tremo_rcc.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/drivers/peripheral/src/tremo_uart.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/drivers/peripheral/src/tremo_delay.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/drivers/peripheral/src/tremo_rtc.c"
 )
 
 add_library(${PROJECT_NAME} OBJECT EXCLUDE_FROM_ALL ${${PROJECT_NAME}_SOURCES})
@@ -53,10 +56,13 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<BOOL:${USE_RADIO_DEBUG}>:U
 set(CMAKE_C_FLAGS_DEBUG -DDEBUG)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/cfg
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
     ${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/platform/system
     ${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/platform/CMSIS
     ${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/drivers/peripheral/inc/
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../radio/sx126x
     $<TARGET_PROPERTY:board,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:system,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:radio,INTERFACE_INCLUDE_DIRECTORIES>

@@ -1,25 +1,3 @@
-/*!
- * \file      rtc-board.c
- *
- * \brief     Target board RTC timer and low power modes management
- *
- * \copyright Revised BSD License, see section \ref LICENSE.
- *
- * \code
- *                ______                              _
- *               / _____)             _              | |
- *              ( (____  _____ ____ _| |_ _____  ____| |__
- *               \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- *               _____) ) ____| | | || |_| ____( (___| | | |
- *              (______/|_____)_|_|_| \__)_____)\____)_| |_|
- *              (C)2013-2017 Semtech
- *
- * \endcode
- *
- * \author    Miguel Luis ( Semtech )
- *
- * \author    Gregory Cristian ( Semtech )
- */
 #include <math.h>
 #include "tremo_rtc.h"
 #include "tremo_rcc.h"
@@ -227,7 +205,7 @@ void BlockLowPowerDuringTask ( bool status )
 {
     if( status == true )
     {
-        RtcRecoverMcuStatus( );
+        RtcRecoverMcuStatus();
     }
     LowPowerDisableDuringTask = status;
 }
@@ -239,11 +217,6 @@ void RtcEnterLowPowerStopMode( void )
     
     rtc_check_syn();
     pwr_deepsleep_wfi(PWR_LP_MODE_STOP3);
-}
-
-void RtcRecoverMcuStatus( void )
-{
-
 }
 
 //static void RtcComputeWakeUpTime( void )
@@ -375,4 +348,32 @@ void RtcOnIrq( void )
 void RtcProcess( void )
 {
     // Not used on this platform.
+}
+
+uint32_t RtcGetMinimumTimeout() {
+
+}
+
+void RtcRecoverMcuStatus( void ) {
+
+}
+
+uint32_t RtcGetTimerElapsedTime() {
+
+}
+
+void RtcSetAlarm(uint32_t timeout) {
+
+}
+
+TimerTime_t RtcTick2Ms(uint32_t tick) {
+
+}
+
+uint32_t RtcMs2Tick(TimerTime_t milliseconds) {
+
+}
+
+void RtcStopAlarm() {
+
 }
