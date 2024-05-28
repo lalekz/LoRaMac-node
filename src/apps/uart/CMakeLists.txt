@@ -22,7 +22,7 @@ cmake_minimum_required(VERSION 3.6)
 # Target
 #---------------------------------------------------------------------------------------
 
-file(GLOB ${PROJECT_NAME}_SOURCES "${CMAKE_CURRENT_LIST_DIR}/${BOARD}/*.c")
+file(GLOB ${PROJECT_NAME}_SOURCES "${CMAKE_CURRENT_LIST_DIR}/*.c")
 add_executable(${PROJECT_NAME}
                             ${${PROJECT_NAME}_SOURCES}
                             $<TARGET_OBJECTS:system>
