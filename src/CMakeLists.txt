@@ -183,6 +183,14 @@ elseif(BOARD STREQUAL B-L072Z-LRWAN1)
 
     # Configure radio
     set(RADIO sx1276 CACHE INTERNAL "Radio sx1276 selected")
+
+elseif(BOARD STREQUAL ASR6601)
+    # Configure toolchain for ASR6601
+    set(LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/boards/ASR6601/cfg/gcc.ld)
+    include(asr6601)
+    
+    # Build platform specific board implementation
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/boards/ASR6601)
 endif()
 
 #---------------------------------------------------------------------------------------
@@ -218,5 +226,9 @@ elseif(APPLICATION STREQUAL rx-sensi)
 elseif(APPLICATION STREQUAL tx-cw)
 
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/tx-cw)
+    
+elseif(APPLICATION STREQUAL uart)
+
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/uart)
 
 endif()
