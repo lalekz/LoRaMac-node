@@ -27,6 +27,8 @@ enable_language(ASM)
 list(APPEND ${PROJECT_NAME}_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/board.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/delay-board.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/rtc-board.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sx126x-board.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/cfg/tremo_it.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/../mcu/utilities.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/platform/system/printf-stdarg.c"
