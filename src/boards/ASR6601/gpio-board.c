@@ -5,7 +5,7 @@
 //NO SUPPORT FOR AF
 //BSR IS ACTUALLY BSRR
 
-gpio_t* get_gpio_address(Gpio_t *obj) {return GPIO_BASE + (obj->portIndex) * 0x400;}
+gpio_t* get_gpio_address(Gpio_t *obj) {return (gpio_t*)(GPIO_BASE + (obj->portIndex) * 0x400);}
 
 void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, PinTypes type, uint32_t value) {
   gpio_t* gpiox = get_gpio_address(obj);
@@ -15,10 +15,15 @@ void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, Pi
   switch(mode){
     case PIN_INPUT:
       gpiox->IER |= gpio_pin;
+      gpio_set_iomux(gpiox, (obj->pinIndex), 0);
+      break;
     case PIN_OUTPUT:
       gpiox->OER |= gpio_pin;
+      gpio_set_iomux(gpiox, (obj->pinIndex), 0);
+      break;
 
     case PIN_ALTERNATE_FCT:
+      gpio_set_iomux(gpiox, (obj->pinIndex), value);
       break;
     case PIN_ANALOGIC:
         gpiox->OER |= gpio_pin;
@@ -31,14 +36,18 @@ void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, Pi
       break;
     case PIN_OPEN_DRAIN:
       gpiox->OTYPER |= gpio_pin;
+      break;
   }
   switch(type) {
     case PIN_NO_PULL:
       break;
     case PIN_PULL_UP:
       gpiox->PSR |= gpio_pin;
+      gpiox->PER |= gpio_pin;
+      break;
     case PIN_PULL_DOWN:
       gpiox->PER |= gpio_pin;
+      break;
   }
 }
 

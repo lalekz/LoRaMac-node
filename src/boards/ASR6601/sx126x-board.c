@@ -18,16 +18,6 @@
 
 uint8_t gPaOptSetting = 0;
 
-void BoardDisableIrq( void )
-{
-    __disable_irq();
-}
-
-void BoardEnableIrq( void )
-{
-    __enable_irq();
-}
-
 uint16_t SspIO(uint16_t outData )
 {
     uint8_t read_data = 0;
@@ -104,7 +94,7 @@ void SX126xWaitOnBusy( void )
 
 void SX126xWakeup( void )
 {
-    BoardDisableIrq( );
+    __disable_irq();
 
     LORAC->NSS_CR = 0;
     delay_us(20);
@@ -117,7 +107,7 @@ void SX126xWakeup( void )
     // Wait for chip to be ready.
     SX126xWaitOnBusy( );
 
-    BoardEnableIrq( );
+    __enable_irq();
 }
 
 void SX126xWriteCommand( RadioCommands_t command, uint8_t *buffer, uint16_t size )

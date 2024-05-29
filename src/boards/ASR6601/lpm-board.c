@@ -4,80 +4,54 @@
 static uint32_t StopModeDisable = 0;
 static uint32_t OffModeDisable = 0;
 
-void LpmSetOffMode( LpmId_t id, LpmSetMode_t mode )
-{
-    CRITICAL_SECTION_BEGIN( );
-
-    switch(mode)
-    {
+void LpmSetOffMode(LpmId_t id, LpmSetMode_t mode) {
+    CRITICAL_SECTION_BEGIN();
+    switch(mode) {
         case LPM_DISABLE:
-        {
-            OffModeDisable |= ( uint32_t )id;
+            OffModeDisable |= (uint32_t)id;
             break;
-        }
         case LPM_ENABLE:
-        {
             OffModeDisable &= ~( uint32_t )id;
             break;
-        }
-        default:
-        {
+        default: 
             break;
-        }
     }
-
-    CRITICAL_SECTION_END( );
-    return;
+    CRITICAL_SECTION_END();
 }
 
-void LpmSetStopMode( LpmId_t id, LpmSetMode_t mode )
-{
-    CRITICAL_SECTION_BEGIN( );
-
-    switch( mode )
-    {
+void LpmSetStopMode(LpmId_t id, LpmSetMode_t mode) {
+    CRITICAL_SECTION_BEGIN();
+    switch( mode ) {
         case LPM_DISABLE:
-        {
             StopModeDisable |= ( uint32_t )id;
             break;
-        }
         case LPM_ENABLE:
-        {
             StopModeDisable &= ~( uint32_t )id;
             break;
-        }
         default:
-        {
             break;
-        }
     }
-
     CRITICAL_SECTION_END( );
     return;
 }
 
-void LpmEnterLowPower( void )
-{
-    if( StopModeDisable != 0 )
-    {
+void LpmEnterLowPower() {
+    if( StopModeDisable != 0 ) {
         /*!
         * SLEEP mode is required
         */
         LpmEnterSleepMode( );
         LpmExitSleepMode( );
     }
-    else
-    { 
-        if( OffModeDisable != 0 )
-        {
+    else { 
+        if( OffModeDisable != 0 ) {
             /*!
             * STOP mode is required
             */
             LpmEnterStopMode( );
             LpmExitStopMode( );
         }
-        else
-        {
+        else {
             /*!
             * OFF mode is required
             */
@@ -85,7 +59,6 @@ void LpmEnterLowPower( void )
             LpmExitOffMode( );
         }
     }
-    return;
 }
 
 void LpmEnterSleepMode()

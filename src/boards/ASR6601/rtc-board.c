@@ -6,7 +6,9 @@
 #include "timer.h"
 #include "radio.h"
 #include "rtc-board.h"
+#include <tremo_regs.h>
 
+#define TICKS_PER_SECOND 32768
 /*!
  * Number of seconds in a minute
  */
@@ -55,8 +57,7 @@ volatile bool NonScheduledWakeUp = false;
 /*!
  * RTC timer context
  */
-typedef struct RtcCalendar_s
-{
+typedef struct RtcCalendar_s {
     rtc_calendar_t CalendarTime;
 } RtcCalendar_t;
 
@@ -102,7 +103,7 @@ volatile uint32_t McuWakeUpTime = 0;
 /*!
  * \brief Start the RTC Alarm (timeoutValue is in ms)
  */
-static void RtcStartWakeUpAlarm( uint32_t timeoutValue );
+static void RtcStartWakeUpAlarm(uint32_t timeoutValue);
 
 /*!
  * \brief Converts a RtcCalendar_t value into TimerTime_t value
@@ -112,9 +113,9 @@ static void RtcStartWakeUpAlarm( uint32_t timeoutValue );
  *                          Others: compute from given calendar value]
  * \retval timerTime New TimerTime_t value
  */
-static TimerTime_t RtcConvertCalendarTickToTimerTime( RtcCalendar_t *calendar );
+static TimerTime_t RtcConvertCalendarTickToTimerTime(RtcCalendar_t *calendar);
 
-static TimerTime_t RtcConvertMsToTick( TimerTime_t timeoutValue );
+static TimerTime_t RtcConvertMsToTick(TimerTime_t timeoutValue);
 
 //static TimerTime_t RtcConvertTickToMs( TimerTime_t timeoutValue );
 
@@ -124,14 +125,12 @@ static TimerTime_t RtcConvertMsToTick( TimerTime_t timeoutValue );
  *
  * \retval calendar RTC calendar
  */
-static RtcCalendar_t RtcGetCalendar( void );
+static RtcCalendar_t RtcGetCalendar();
 
-extern void rtc_check_syn(void);
+extern void rtc_check_syn();
 
-void RtcInit( void )
-{
-    if( RtcInitialized == false )
-    {
+void RtcInit() {
+    if(RtcInitialized == false) {
         rtc_deinit();
         rcc_enable_peripheral_clk(RCC_PERIPHERAL_RTC, true);
 
@@ -142,53 +141,31 @@ void RtcInit( void )
     }
 }
 
-void RtcSetTimeout( uint32_t timeout )
-{
-    RtcStartWakeUpAlarm( timeout );
-}
+void RtcSetTimeout(uint32_t timeout) {RtcStartWakeUpAlarm(timeout);}
 
-void RtcStopTimeout( void )
-{
+void RtcStopTimeout() {
     rtc_cyc_cmd(DISABLE);
     rtc_config_interrupt(RTC_CYC_IT, DISABLE); // disable
 }
 
-TimerTime_t RtcGetTimerContext( void )
-{
-    return RtcTimerContext;
-}
+TimerTime_t RtcGetTimerContext() {return RtcTimerContext;}
 
-TimerTime_t RtcSetTimerContext( void )
-{
-    RtcTimerContext = RtcGetTimerValue();
-    
-    return RtcTimerContext;
-}
+TimerTime_t RtcSetTimerContext() {return RtcGetTimerValue();}
 
-TimerTime_t RtcGetElapsedTime( void )
-{
-    return (RtcGetTimerValue() - RtcTimerContext); 
-}
+TimerTime_t RtcGetElapsedTime() {return (RtcGetTimerValue() - RtcTimerContext);}
 
-TimerTime_t RtcGetAdjustedTimeoutValue( uint32_t timeout )
-{
-    if( timeout > McuWakeUpTime )
-    {   // we have waken up from a GPIO and we have lost "McuWakeUpTime" that we need to compensate on next event
-        if( NonScheduledWakeUp == true )
-        {
+TimerTime_t RtcGetAdjustedTimeoutValue(uint32_t timeout) {
+    if( timeout > McuWakeUpTime ) {   // we have waken up from a GPIO and we have lost "McuWakeUpTime" that we need to compensate on next event
+        if( NonScheduledWakeUp == true ) {
             NonScheduledWakeUp = false;
             timeout -= McuWakeUpTime;
         }
     }
 
-    if( timeout > McuWakeUpTime )
-    {   // we don't go in low power mode for delay below 50ms (needed for LEDs)
+    if( timeout > McuWakeUpTime ) {   // we don't go in low power mode for delay below 50ms (needed for LEDs)
         if( timeout < 50 ) // 50 ms
-        {
             RtcTimerEventAllowsLowPower = false;
-        }
-        else
-        {
+        else {
             RtcTimerEventAllowsLowPower = true;
             timeout -= McuWakeUpTime;
         }
@@ -196,10 +173,11 @@ TimerTime_t RtcGetAdjustedTimeoutValue( uint32_t timeout )
     return  timeout;
 }
 
-TimerTime_t RtcGetTimerValue( void )
-{
-    return RtcConvertCalendarTickToTimerTime( NULL );
+void RtcRecoverMcuStatus() {
+
 }
+
+TimerTime_t RtcGetTimerValue() {return RtcConvertCalendarTickToTimerTime(NULL);}
 
 void BlockLowPowerDuringTask ( bool status )
 {
@@ -230,16 +208,13 @@ void RtcEnterLowPowerStopMode( void )
 //    }
 //}
 
-static void RtcStartWakeUpAlarm( uint32_t timeout )
-{   
+static void RtcStartWakeUpAlarm(uint32_t timeout) {   
     RtcCalendar_t now;
     if( timeout <= 5 )
-    {
         timeout = 5;
-    }
 
     // Load the RTC calendar
-    now = RtcGetCalendar( );
+    now = RtcGetCalendar();
 
     // Save the calendar into RtcCalendarContext to be able to calculate the elapsed time
     RtcCalendarContext = now;
@@ -251,101 +226,75 @@ static void RtcStartWakeUpAlarm( uint32_t timeout )
     rtc_config_interrupt(RTC_CYC_IT, ENABLE);
 }
 
-static TimerTime_t RtcConvertCalendarTickToTimerTime( RtcCalendar_t *calendar )
-{
+static TimerTime_t RtcConvertCalendarTickToTimerTime(RtcCalendar_t *calendar) {
     TimerTime_t timeCounter = 0;
     RtcCalendar_t now;
     TimerTime_t timeCounterTemp = 0;
 
     // Passing a NULL pointer will compute from "now" else,
     // compute from the given calendar value
-    if( calendar == NULL )
-    {
-        now = RtcGetCalendar( );
-    }
+    if(calendar == NULL)
+        now = RtcGetCalendar();
     else
-    {
         now = *calendar;
-    }
 
     // Years (calculation valid up to year 2099)
-    for( int16_t i = 0; i < (now.CalendarTime.year-2000) ; i++ )
-    {
-        if( ( i == 0 ) || ( i % 4 ) == 0 )
-        {
-            timeCounterTemp += ( uint32_t )SecondsInLeapYear;
-        }
+    for(int16_t i = 0; i < (now.CalendarTime.year-2000) ; i++) {
+        if(( i == 0 ) || ( i % 4 ) == 0)
+            timeCounterTemp += (uint32_t)SecondsInLeapYear;
         else
-        {
-            timeCounterTemp += ( uint32_t )SecondsInYear;
-        }
+            timeCounterTemp += (uint32_t)SecondsInYear;
     }
 
     // Months (calculation valid up to year 2099)*/
-    if( ( now.CalendarTime.year % 4 ) == 0 )
-    {
-        for( uint8_t i = 0; i < ( now.CalendarTime.month - 1 ); i++ )
-        {
-            timeCounterTemp += ( uint32_t )( DaysInMonthLeapYear[i] * SecondsInDay );
-        }
+    if((now.CalendarTime.year % 4) == 0) {
+        for( uint8_t i = 0; i < (now.CalendarTime.month - 1); i++)
+            timeCounterTemp += (uint32_t)(DaysInMonthLeapYear[i] * SecondsInDay);
     }
-    else
-    {
+    else {
         for( uint8_t i = 0;  i < ( now.CalendarTime.month - 1 ); i++ )
-        {
             timeCounterTemp += ( uint32_t )( DaysInMonth[i] * SecondsInDay );
-        }
     }
 
-    timeCounterTemp += ( TimerTime_t )( now.CalendarTime.second +
-                                      ( ( TimerTime_t )now.CalendarTime.minute * SecondsInMinute ) +
-                                      ( ( TimerTime_t )now.CalendarTime.hour * SecondsInHour ) +
-                                      ( ( TimerTime_t )( (now.CalendarTime.day-1) * SecondsInDay ) ) );
+    timeCounterTemp += (TimerTime_t)( now.CalendarTime.second +
+                                      ((TimerTime_t)now.CalendarTime.minute * SecondsInMinute) +
+                                      ((TimerTime_t)now.CalendarTime.hour * SecondsInHour) +
+                                      ((TimerTime_t)((now.CalendarTime.day-1) * SecondsInDay)));
 
     timeCounter = timeCounterTemp*1000 + now.CalendarTime.subsecond/1000;
 
-    return ( timeCounter );
+    return (timeCounter);
 }
 
-TimerTime_t RtcConvertMsToTick( TimerTime_t timeoutValue )
-{
-    double retVal = 0;
-    uint32_t rtc_ticks_per_second = 32768;
-	
-    retVal = round( ( ( double )timeoutValue ) * rtc_ticks_per_second / 1000);
-    return( ( TimerTime_t )retVal );
+TimerTime_t RtcConvertMsToTick(TimerTime_t timeoutValue) {
+    return((TimerTime_t)round(((double)timeoutValue) * TICKS_PER_SECOND / 1000));
 }
 
-static RtcCalendar_t RtcGetCalendar( void )
-{
+static RtcCalendar_t RtcGetCalendar() {
     RtcCalendar_t now;
     rtc_get_calendar(&now.CalendarTime);
-
-    return( now );
+    return(now);
 }
 
 /*!
  * \brief RTC IRQ Handler of the RTC Alarm
  */
-void RtcOnIrq( void )
-{
+void RtcOnIrq() {
     uint8_t intr_stat;
     intr_stat =  rtc_get_status(RTC_CYC_SR);
  
-    if( intr_stat == true ) {
-        
+    if(intr_stat == true) {
         rtc_cyc_cmd(DISABLE);
         rtc_config_interrupt(RTC_CYC_IT, DISABLE); // disable
         rtc_set_status(RTC_CYC_SR, false); // clear
         
-        TimerIrqHandler( );
+        TimerIrqHandler();
     
         rtc_config_interrupt(RTC_CYC_IT, ENABLE); // enable
-        
     }
 }
 
-void RtcProcess( void )
+void RtcProcess()
 {
     // Not used on this platform.
 }
@@ -354,26 +303,56 @@ uint32_t RtcGetMinimumTimeout() {
 
 }
 
-void RtcRecoverMcuStatus( void ) {
-
-}
-
 uint32_t RtcGetTimerElapsedTime() {
-
-}
-
-void RtcSetAlarm(uint32_t timeout) {
-
+    return ((RTC->CYC_MAX) - (RTC->CYC_CNT)) * 1000000 / TICKS_PER_SECOND;
 }
 
 TimerTime_t RtcTick2Ms(uint32_t tick) {
-
+    return (uint32_t) round((double) tick / TICKS_PER_SECOND * 1000);
 }
 
 uint32_t RtcMs2Tick(TimerTime_t milliseconds) {
+    return (uint32_t) round(((double)milliseconds) * TICKS_PER_SECOND / 1000);
+}
 
+void RtcSetAlarm(uint32_t timeout) {
+    uint32_t time_params[] = {0, 0, 0, 0, 0}; //day hour min sec subsec 
+    uint32_t time_div[] = {24, 60, 60, 1000000}; //day hour min sec subsec 
+    uint8_t mask_params[] = {0, 1, 1, 1, 1, 1}; //week day hour min sec subsec 
+    uint8_t i;
+    rtc_calendar_t calendar;
+    rtc_alarm_mask_t mask;
+
+    time_params[7] = RtcTick2Ms(timeout) * 1000;
+    
+    for(i = 4; i >= 1; i--) {
+        if(time_params[i] > time_div[i - 1]) {
+            time_params[i - 1] = time_params[i] / time_div[i - 1];
+            time_params[i] %= time_div[i - 1];
+            mask_params[i] = 0;
+        }
+        else 
+            break;
+    }
+    rtc_get_calendar(&calendar);
+    
+    calendar.day += time_params[0]; 
+    calendar.hour += time_params[1];  
+    calendar.minute += time_params[2]; 
+    calendar.second += time_params[3]; 
+    calendar.subsecond += time_params[4]; 
+
+    mask.weekMask = mask_params[0];  
+    mask.dayMask = mask_params[1];  
+    mask.hrMask = mask_params[2];  
+    mask.minMask = mask_params[3];      
+    mask.secMask = mask_params[4];   
+    mask.subsecMask = mask_params[5];
+
+    rtc_set_alarm(0, &mask, &calendar);
+    rtc_alarm_cmd(0, true);
 }
 
 void RtcStopAlarm() {
-
+    rtc_alarm_cmd(0, false);
 }

@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 #include "board.h"
 #include "gpio.h"
 #include "delay.h"
@@ -209,6 +210,7 @@ int main( void )
                     if( strncmp( ( const char* )Buffer, ( const char* )PongMsg, 4 ) == 0 )
                     {
                         // Indicates on a LED that the received frame is a PONG
+                        printf("pong\n");
                         GpioToggle( &Led1 );
 
                         // Send the next PING frame
@@ -272,6 +274,7 @@ int main( void )
             // Indicates on a LED that we have sent a PING [Master]
             // Indicates on a LED that we have sent a PONG [Slave]
             GpioToggle( &Led2 );
+            printf("ping\n");
             Radio.Rx( RX_TIMEOUT_VALUE );
             State = LOWPOWER;
             break;

@@ -5,11 +5,19 @@
 #include "tremo_rcc.h"
 #include "tremo_delay.h"
 #include "utilities.h"
+#include "gpio.h"
+#include "board-config.h"
+#include "lpm-board.h"
 
-void BoardInitMcu(){ 
+Gpio_t Led1;    // Active Low
+Gpio_t Led2; // Active Low
+
+void BoardInitMcu() { 
   uart_config_t uart_config_var;
   //init GPIO
+  rcc_enable_peripheral_clk(RCC_PERIPHERAL_GPIOA, true); 
   rcc_enable_peripheral_clk(RCC_PERIPHERAL_GPIOB, true); 
+  rcc_enable_peripheral_clk(RCC_PERIPHERAL_GPIOD, true); 
   gpio_set_iomux(GPIOB, GPIO_PIN_0, 1);
   gpio_set_iomux(GPIOB, GPIO_PIN_1, 1);
   //init UART0
@@ -22,7 +30,7 @@ void BoardInitMcu(){
   delay_init();
 }
 
-void BoardInitPeriph(){
+void BoardInitPeriph() {
  // not used
 }
 
