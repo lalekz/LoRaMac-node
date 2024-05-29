@@ -1,13 +1,14 @@
 #include "board.h"
-#include "utilities.h"
-#include "core_cm4.h"
-#include "core_cmFunc.h"
-#include "gpio.h"
-#include "uart.h"
-#include "board-config.h"
-#include "pinName-board.h"
-#include "lpm-board.h"
+#include "tremo_cm4.h"
+#include "tremo_uart.h"
+#include "tremo_gpio.h"
+#include "tremo_rcc.h"
 #include "tremo_delay.h"
+#include "utilities.h"
+#include "gpio.h"
+#include "board-config.h"
+#include "lpm-board.h"
+#include "uart.h"
 
 Gpio_t Led1; //PA4
 Gpio_t Led2; //PA5
