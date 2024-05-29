@@ -64,8 +64,13 @@ void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, Pi
 }
 
 void GpioMcuToggle(Gpio_t *obj) {
-  gpio_t* gpiox = get_gpio_address(obj->portIndex);
-  uint16_t gpio_pin = 1 << (obj->pinIndex);
-  gpiox->BSR = 0;
-  gpiox->BSR |= gpio_pin << ((gpiox->ODR) & gpio_pin ? 16 : 0);
+  gpio_toggle(get_gpio_address(obj->portIndex), obj->pinIndex);
+}
+
+void GpioMcuWrite(Gpio_t *obj, uint32_t value) {
+  gpio_write(get_gpio_address(obj->portIndex), obj->pinIndex, value ? GPIO_LEVEL_HIGH : GPIO_LEVEL_LOW);
+}
+
+uint32_t GpioMcuRead(Gpio_t *obj) {
+  return (uint32_t)gpio_read(get_gpio_address(obj->portIndex), obj->pinIndex);
 }
