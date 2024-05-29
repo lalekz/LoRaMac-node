@@ -32,7 +32,7 @@ void UartMcuConfig(Uart_t *obj, UartMode_t mode, uint32_t baudrate, WordLength_t
     StopBits_t stopBits, Parity_t parity, FlowCtrl_t flowCtrl) {
     uart_config_t uart_config;
     uart_t* uart = get_uart_address(obj->UartId);
-    uint32_t rcc_uart;
+    uint32_t rcc_uart = 0;
 
     if(!obj->IsInitialized) {
         uart_config_init(&uart_config);
@@ -110,24 +110,40 @@ void UartMcuDeInit( Uart_t *obj ){
 }
 
 uint8_t UartMcuPutChar( Uart_t *obj, uint8_t data ) {
+    if(get_uart_address(obj->UartId)->FR & UART_FLAG_BUSY) 
+        return 1;
     CRITICAL_SECTION_BEGIN();
     uart_send_data(get_uart_address(obj->UartId), data);
     CRITICAL_SECTION_END();
+    return 0;
 }
 
-uint8_t UartMcuGetChar( Uart_t *obj, uint8_t *data )
-{
+uint8_t UartMcuGetChar( Uart_t *obj, uint8_t *data ) {
     uint8_t ret;
+    if(get_uart_address(obj->UartId)->FR & UART_FLAG_BUSY) 
+        return 1;
     CRITICAL_SECTION_BEGIN();
     ret = uart_recieve_data(get_uart_address(obj->UartId));
     CRITICAL_SECTION_END();
     *data = ret;
+    return 0;
 }
 
 uint8_t UartMcuPutBuffer(Uart_t *obj, uint8_t *buffer, uint16_t size) {
-    
+    uint16_t i;
+    for(i = 0; i < size; i++) {
+        if(UartMcuPutChar(obj, *(buffer + i)))
+            return 1;
+    }
 }
 
 uint8_t UartMcuGetBuffer(Uart_t *obj, uint8_t *buffer, uint16_t size, uint16_t *nbReadBytes){
-    
+    uint16_t i;
+    uart_t* uart = get_uart_address(obj->UartId);
+    for(i = 0; i < size; i++) {
+        if(UartMcuGetChar(obj, buffer + i))
+            return 1;
+        if(!(uart->RSC_ECR))
+            *(nbReadBytes) += 1;
+    }
 }
