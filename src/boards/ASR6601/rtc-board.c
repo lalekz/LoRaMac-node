@@ -316,43 +316,39 @@ uint32_t RtcMs2Tick(TimerTime_t milliseconds) {
 }
 
 void RtcSetAlarm(uint32_t timeout) {
-    uint32_t time_params[] = {0, 0, 0, 0, 0}; //day hour min sec subsec 
-    uint32_t time_div[] = {24, 60, 60, 1000000}; //day hour min sec subsec 
-    uint8_t mask_params[] = {0, 1, 1, 1, 1, 1}; //week day hour min sec subsec 
+    uint32_t time_params[] = {0, 0, 0, 0}; //day hour min sec
+    uint8_t time_div[] = {24, 60, 60}; //hour min sec div  
+    uint8_t mask_params[] = {1, 1, 1}; //day hour min check
+    uint8_t dec_shift[] = {24, 20, 18, 14, 11, 7, 4, 0}; //dec data pos
+    uint32_t* ptr;
     uint8_t i;
-    rtc_calendar_t calendar;
-    rtc_alarm_mask_t mask;
-
-    time_params[7] = RtcTick2Ms(timeout) * 1000;
+    RtcCalendar_t calendar;
     
-    for(i = 4; i >= 1; i--) {
+    rtc_get_calendar(&calendar);
+    ptr = &calendar + 4; //points to day
+
+    if(RtcTick2Ms(timeout) > 1000)
+        time_params[4] = (uint32_t)((double)RtcTick2Ms(timeout) / 1000 + *(ptr + 3));
+
+    for(i = 3; i >= 1; i--) {
+
         if(time_params[i] > time_div[i - 1]) {
-            time_params[i - 1] = time_params[i] / time_div[i - 1];
+            time_params[i - 1] = time_params[i] / time_div[i - 1] + *(ptr + i - 1); //parameter overflow + current parameter
             time_params[i] %= time_div[i - 1];
-            mask_params[i] = 0;
+            mask_params[i - 1] = 0;
         }
         else 
             break;
     }
-    rtc_get_calendar(&calendar);
     
-    calendar.day += time_params[0]; 
-    calendar.hour += time_params[1];  
-    calendar.minute += time_params[2]; 
-    calendar.second += time_params[3]; 
-    calendar.subsecond += time_params[4]; 
+    RTC->ALARM0 = 0;
+    for(i = 29; i >= 27; i--)
+        RTC->ALARM0 |= mask_params[29 - i] << i;
 
-    mask.weekMask = mask_params[0];  
-    mask.dayMask = mask_params[1];  
-    mask.hrMask = mask_params[2];  
-    mask.minMask = mask_params[3];      
-    mask.secMask = mask_params[4];   
-    mask.subsecMask = mask_params[5];
-
-    rtc_set_alarm(0, &mask, &calendar);
-    rtc_alarm_cmd(0, true);
+    for(i = 0; i < 8; i ++)
+        RTC->ALARM0 |= (i % 2 ? time_params[i / 2] % 10 : time_params[i / 2] / 10) << dec_shift[i];
+        
+    RTC->ALARM0 |= RTC_ENABLE_ALARM;
 }
 
-void RtcStopAlarm() {
-    rtc_alarm_cmd(0, false);
-}
+void RtcStopAlarm() {rtc_alarm_cmd(0, false);}

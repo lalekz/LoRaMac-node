@@ -160,10 +160,8 @@ int main( void )
     RadioEvents.RxTimeout = OnRxTimeout;
     RadioEvents.RxError = OnRxError;
 
-    Radio.Init( &RadioEvents );
-
-    Radio.SetChannel( RF_FREQUENCY );
-
+    Radio.Init(&RadioEvents);
+    Radio.SetChannel(RF_FREQUENCY);
 #if defined( USE_MODEM_LORA )
 
     Radio.SetTxConfig( MODEM_LORA, TX_OUTPUT_POWER, 0, LORA_BANDWIDTH,
@@ -280,6 +278,7 @@ int main( void )
             break;
         case RX_TIMEOUT:
         case RX_ERROR:
+            printf("error\n");
             if( isMaster == true )
             {
                 // Send the next PING frame

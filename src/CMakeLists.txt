@@ -231,4 +231,8 @@ elseif(APPLICATION STREQUAL uart)
 
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/uart)
 
+elseif(APPLICATION STREQUAL RTC)
+
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/uart)
+
 endif()

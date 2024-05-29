@@ -62,7 +62,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/platform/system
     ${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/platform/CMSIS
     ${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/drivers/peripheral/inc/
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../radio/sx126x
     $<TARGET_PROPERTY:board,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:system,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:radio,INTERFACE_INCLUDE_DIRECTORIES>

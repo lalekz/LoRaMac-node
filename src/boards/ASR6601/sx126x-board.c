@@ -5,14 +5,10 @@
 #include "tremo_regs.h"
 #include "tremo_delay.h"
 #include "tremo_rtc.h"
+#include "board-config.h"
+#include "delay.h"
 #include "radio.h"
 #include "sx126x-board.h"
-
-#define CONFIG_LORA_RFSW_CTRL_GPIOX GPIOD
-#define CONFIG_LORA_RFSW_CTRL_PIN   GPIO_PIN_11
-
-#define CONFIG_LORA_RFSW_VDD_GPIOX GPIOA
-#define CONFIG_LORA_RFSW_VDD_PIN   GPIO_PIN_10
 
 #define BOARD_TCXO_WAKEUP_TIME 5
 
