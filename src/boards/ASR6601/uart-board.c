@@ -28,11 +28,22 @@ uart_t* get_uart_address(UartId_t uart){
             return UART2;
      }
 } 
+
+uint32_t get_rcc_uart_address(UartId_t uart){
+    switch(uart) {
+        case UART_USB_CDC:
+            return RCC_PERIPHERAL_UART0;
+        case UART_1:
+            return RCC_PERIPHERAL_UART1;
+        case UART_2:
+            return RCC_PERIPHERAL_UART2;
+    }
+} 
+
 void UartMcuConfig(Uart_t *obj, UartMode_t mode, uint32_t baudrate, WordLength_t wordLength, 
     StopBits_t stopBits, Parity_t parity, FlowCtrl_t flowCtrl) {
     uart_config_t uart_config;
     uart_t* uart = get_uart_address(obj->UartId);
-    uint32_t rcc_uart = 0;
 
     if(!obj->IsInitialized) {
         uart_config_init(&uart_config);
@@ -86,25 +97,16 @@ void UartMcuConfig(Uart_t *obj, UartMode_t mode, uint32_t baudrate, WordLength_t
             default:
                 break;
         }
-        switch(obj->UartId) {
-            case UART_USB_CDC:
-                rcc_uart = RCC_PERIPHERAL_UART0;
-                break;
-            case UART_1:
-                rcc_uart = RCC_PERIPHERAL_UART1;
-                break;
-            case UART_2:
-                rcc_uart = RCC_PERIPHERAL_UART2;
-                break;
-        }
-        rcc_enable_peripheral_clk(rcc_uart, true);
+        
+        rcc_enable_peripheral_clk(get_rcc_uart_address(obj->UartId), true);
         uart_init(uart, &uart_config);
         uart_cmd(uart, ENABLE);
     }
 }
 
-void UartMcuDeInit( Uart_t *obj ){
-    //!!!
+void UartMcuDeInit(Uart_t *obj ){
+    uart_deinit(get_uart_address(obj->UartId));
+    obj->IsInitialized = false;
     GpioInit( &obj->Tx, obj->Tx.pin, PIN_ANALOGIC, PIN_PUSH_PULL, PIN_NO_PULL, 0);
     GpioInit( &obj->Rx, obj->Rx.pin, PIN_ANALOGIC, PIN_PUSH_PULL, PIN_NO_PULL, 0);
 }
