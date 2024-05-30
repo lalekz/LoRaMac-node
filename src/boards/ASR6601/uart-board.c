@@ -15,7 +15,6 @@ void UartMcuInit(Uart_t *obj, UartId_t uartId, PinNames tx, PinNames rx) {
     obj->UartId = uartId;
     GpioInit( &obj->Tx, tx, PIN_ALTERNATE_FCT, PIN_PUSH_PULL, PIN_PULL_UP, 1);
     GpioInit( &obj->Rx, rx, PIN_ALTERNATE_FCT, PIN_PUSH_PULL, PIN_PULL_UP, 1);
-    obj->IsInitialized = true;
 }
 
 uart_t* get_uart_address(UartId_t uart){
@@ -44,64 +43,61 @@ void UartMcuConfig(Uart_t *obj, UartMode_t mode, uint32_t baudrate, WordLength_t
     StopBits_t stopBits, Parity_t parity, FlowCtrl_t flowCtrl) {
     uart_config_t uart_config;
     uart_t* uart = get_uart_address(obj->UartId);
+    uart_config_init(&uart_config);
 
-    if(!obj->IsInitialized) {
-        uart_config_init(&uart_config);
+    uart_config.baudrate = baudrate;
 
-        uart_config.baudrate = baudrate;
-
-        switch(wordLength) {
-            case UART_8_BIT: 
-                uart_config.data_width = UART_DATA_WIDTH_8;
-                break;
-            default:
-                break;
-        }
-        switch(stopBits) {
-            case UART_1_STOP_BIT:
-                uart_config.stop_bits = UART_STOP_BITS_1;
-                break;
-            case UART_2_STOP_BIT:
-                uart_config.stop_bits = UART_STOP_BITS_2;
-                break;
-            default:
-                break;
-        }
-        switch(parity) {
-            case NO_PARITY:
-                uart_config.parity = UART_PARITY_NO;
-                break;
-            case EVEN_PARITY:
-                uart_config.parity = UART_PARITY_EVEN;
-                break;
-            case ODD_PARITY:
-                uart_config.parity = UART_PARITY_ODD;
-                break;
-            default:
-                break;
-        }
-
-        switch(flowCtrl) {
-            case NO_FLOW_CTRL:
-                uart_config.flow_control = UART_FLOW_CONTROL_DISABLED;
-                break;
-            case RTS_FLOW_CTRL:
-                uart_config.flow_control = UART_FLOW_CONTROL_RTS;
-                break;
-            case CTS_FLOW_CTRL:
-                uart_config.flow_control = UART_FLOW_CONTROL_CTS;
-                break;
-            case RTS_CTS_FLOW_CTRL:
-                uart_config.flow_control = UART_FLOW_CONTROL_CTS_RTS;
-                break;
-            default:
-                break;
-        }
-        
-        rcc_enable_peripheral_clk(get_rcc_uart_address(obj->UartId), true);
-        uart_init(uart, &uart_config);
-        uart_cmd(uart, ENABLE);
+    switch(wordLength) {
+        case UART_8_BIT: 
+            uart_config.data_width = UART_DATA_WIDTH_8;
+            break;
+        default:
+            break;
     }
+    switch(stopBits) {
+        case UART_1_STOP_BIT:
+            uart_config.stop_bits = UART_STOP_BITS_1;
+            break;
+        case UART_2_STOP_BIT:
+            uart_config.stop_bits = UART_STOP_BITS_2;
+            break;
+        default:
+            break;
+    }
+    switch(parity) {
+        case NO_PARITY:
+            uart_config.parity = UART_PARITY_NO;
+            break;
+        case EVEN_PARITY:
+            uart_config.parity = UART_PARITY_EVEN;
+            break;
+        case ODD_PARITY:
+            uart_config.parity = UART_PARITY_ODD;
+            break;
+        default:
+            break;
+    }
+
+    switch(flowCtrl) {
+        case NO_FLOW_CTRL:
+            uart_config.flow_control = UART_FLOW_CONTROL_DISABLED;
+            break;
+        case RTS_FLOW_CTRL:
+            uart_config.flow_control = UART_FLOW_CONTROL_RTS;
+            break;
+        case CTS_FLOW_CTRL:
+            uart_config.flow_control = UART_FLOW_CONTROL_CTS;
+            break;
+        case RTS_CTS_FLOW_CTRL:
+            uart_config.flow_control = UART_FLOW_CONTROL_CTS_RTS;
+            break;
+        default:
+            break;
+    }
+        
+    rcc_enable_peripheral_clk(get_rcc_uart_address(obj->UartId), true);
+    uart_init(uart, &uart_config);
+    uart_cmd(uart, ENABLE);
 }
 
 void UartMcuDeInit(Uart_t *obj ){

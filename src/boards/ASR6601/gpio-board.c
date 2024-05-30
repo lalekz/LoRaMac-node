@@ -6,10 +6,11 @@
 //BSR IS ACTUALLY BSRR
 
 gpio_t* get_gpio_address(uint8_t port_index) {return GPIO_BASE + port_index * 0x400;}
+
 void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, PinTypes type, uint32_t value) {
   
-  uint8_t port_index = pin / 15;
-  uint8_t pin_index = pin % 15;
+  uint16_t port_index = pin / 16;
+  uint16_t pin_index = pin % 16;
   gpio_t* port = get_gpio_address(port_index);
   
   obj->pinIndex = pin_index;
@@ -24,12 +25,10 @@ void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, Pi
   switch(mode){
     case PIN_INPUT:
       port->IER |= 1 << pin_index;
-      gpio_set_iomux(port, pin_index, 0);
       
       break;
     case PIN_OUTPUT:
       port->OER |= 1 << pin_index;
-      gpio_set_iomux(port, pin_index, 0);
       break;
 
     case PIN_ALTERNATE_FCT:
