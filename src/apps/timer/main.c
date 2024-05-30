@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include "board.h"
-#include "rtc.h"
+#include "gpio.h"
+#include "timer.h"
 
-/**
- * Main application entry point.
- */
 int main(){
     // Target board initialization
     BoardInitMcu();
     BoardInitPeriph();
+    while(1){
+        printf("Hello, world!\n");
+        
+    }
 }

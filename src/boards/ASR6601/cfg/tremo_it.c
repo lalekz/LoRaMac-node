@@ -1,6 +1,9 @@
 
 #include "tremo_it.h"
 
+//extern void RadioOnDioIrq(void);
+extern void RtcOnIrq(void);
+
 /**
   * @brief  This function handles NMI exception.
   * @param  None
@@ -94,7 +97,16 @@ void SysTick_Handler(void)
 void PWR_IRQHandler()
 {
 }
-
+/*
+void LORA_IRQHandler()
+{
+    RadioOnDioIrq();
+}
+*/
+void RTC_IRQHandler(void)
+{
+    RtcOnIrq();
+}
 /******************************************************************************/
 /*                 Tremo Peripherals Interrupt Handlers                   */
 /*  Add here the Interrupt Handler for the used peripheral(s) (PPP), for the  */

@@ -231,8 +231,8 @@ elseif(APPLICATION STREQUAL uart)
 
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/uart)
 
-elseif(APPLICATION STREQUAL RTC)
+elseif(APPLICATION STREQUAL timer)
 
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/uart)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/timer)
 
 endif()
