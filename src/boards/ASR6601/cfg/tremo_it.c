@@ -1,6 +1,6 @@
 
 #include "tremo_it.h"
-
+#include "rtc-board.h"
 //extern void RadioOnDioIrq(void);
 extern void RtcOnIrq(void);
 
@@ -105,7 +105,7 @@ void LORA_IRQHandler()
 */
 void RTC_IRQHandler(void)
 {
-    RtcOnIrq();
+    RtcBoardIrqHandler();
 }
 /******************************************************************************/
 /*                 Tremo Peripherals Interrupt Handlers                   */

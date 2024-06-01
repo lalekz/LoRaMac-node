@@ -1,12 +1,10 @@
 #include <math.h>
 #include "tremo_rtc.h"
 #include "tremo_rcc.h"
-#include "tremo_pwr.h"
 #include "utilities.h"
 #include "timer.h"
-#include "radio.h"
 #include "rtc-board.h"
-#include <tremo_regs.h>
+#include "tremo_regs.h"
 
 #define MINIMAL_TIMEOUT 5
 #define TICKS_PER_SECOND 32768
@@ -67,7 +65,6 @@ TimerTime_t RtcTimerContext;
 /*!
  * \brief Indicates if the RTC is already Initialized or not
  */
-static bool RtcInitialized = false;
 
 /*!
  * \brief Converts a RtcCalendar_t value into TimerTime_t value
@@ -92,15 +89,12 @@ static RtcCalendar_t RtcGetCalendar();
 extern void rtc_check_syn();
 
 void RtcInit() {
-    if(RtcInitialized == false) {
-        rtc_deinit();
-        rcc_enable_peripheral_clk(RCC_PERIPHERAL_RTC, true);
+    rcc_enable_peripheral_clk(RCC_PERIPHERAL_AFEC, true);
+    rcc_enable_oscillator(RCC_OSC_XO32K, true);
+    rcc_enable_peripheral_clk(RCC_PERIPHERAL_RTC, true);
 
-        rtc_calendar_cmd(ENABLE);
-        NVIC_EnableIRQ(RTC_IRQn);
-        
-        RtcInitialized = true;
-    }
+    rtc_calendar_cmd(ENABLE);
+    NVIC_EnableIRQ(RTC_IRQn);
 }
 
 uint32_t RtcGetMinimumTimeout() {
@@ -132,7 +126,10 @@ void RtcSetAlarm(uint32_t timeout) {
     RtcCalendarContext = now;
 
     rtc_cyc_cmd(DISABLE);
-    rtc_config_cyc_max(RtcMs2Tick(timeout));
+    rtc_config_cyc_max(timeout);
+    rtc_config_cyc_wakeup(ENABLE);
+    rtc_cyc_cmd(ENABLE);
+    rtc_config_interrupt(RTC_CYC_IT, ENABLE);
 }
 
 
@@ -143,9 +140,7 @@ void RtcStopAlarm() {
 
 void RtcStartAlarm(uint32_t timeout) {
     RtcSetAlarm(timeout);
-    rtc_config_cyc_wakeup(ENABLE);
-    rtc_cyc_cmd(ENABLE);
-    rtc_config_interrupt(RTC_CYC_IT, ENABLE);
+    
 }
 
 TimerTime_t RtcSetTimerContext() {
@@ -230,4 +225,12 @@ void RtcProcess()
     // Not used on this platform.
 }
 
+void RtcBoardIrqHandler(void) {
+    if (rtc_get_status(RTC_CYC_SR)) {
+        rtc_config_interrupt(RTC_CYC_IT, DISABLE);
+        rtc_set_status(RTC_CYC_SR, false);
+        rtc_config_interrupt(RTC_CYC_IT, ENABLE);
+        TimerIrqHandler();
+    }
+}
 

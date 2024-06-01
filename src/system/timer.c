@@ -24,7 +24,6 @@
 #include "board.h"
 #include "rtc-board.h"
 #include "timer.h"
-
 /*!
  * Safely execute call back
  */
