@@ -5,6 +5,7 @@
 #include "timer.h"
 #include "rtc-board.h"
 #include "tremo_regs.h"
+#include "tremo_it.h"
 
 #define MINIMAL_TIMEOUT 5
 #define TICKS_PER_SECOND 32768

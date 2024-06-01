@@ -26,6 +26,7 @@ uart_t* get_uart_address(UartId_t uart){
         case UART_2:
             return UART2;
      }
+     return 0;
 } 
 
 uint32_t get_rcc_uart_address(UartId_t uart){
@@ -37,6 +38,7 @@ uint32_t get_rcc_uart_address(UartId_t uart){
         case UART_2:
             return RCC_PERIPHERAL_UART2;
     }
+    return 0;
 } 
 
 void UartMcuConfig(Uart_t *obj, UartMode_t mode, uint32_t baudrate, WordLength_t wordLength, 
@@ -121,7 +123,7 @@ uint8_t UartMcuGetChar( Uart_t *obj, uint8_t *data ) {
     if(get_uart_address(obj->UartId)->FR & UART_FLAG_BUSY) 
         return 1;
     CRITICAL_SECTION_BEGIN();
-    ret = uart_recieve_data(get_uart_address(obj->UartId));
+    ret = uart_receive_data(get_uart_address(obj->UartId));
     CRITICAL_SECTION_END();
     *data = ret;
     return 0;
@@ -133,6 +135,7 @@ uint8_t UartMcuPutBuffer(Uart_t *obj, uint8_t *buffer, uint16_t size) {
         if(UartMcuPutChar(obj, *(buffer + i)))
             return 1;
     }
+    return 0;
 }
 
 uint8_t UartMcuGetBuffer(Uart_t *obj, uint8_t *buffer, uint16_t size, uint16_t *nbReadBytes){
@@ -144,4 +147,5 @@ uint8_t UartMcuGetBuffer(Uart_t *obj, uint8_t *buffer, uint16_t size, uint16_t *
         if(!(uart->RSC_ECR))
             *(nbReadBytes) += 1;
     }
+    return 0;
 }

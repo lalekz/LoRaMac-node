@@ -596,10 +596,11 @@ void rtc_set_alarm(uint8_t alarm_index, rtc_alarm_mask_t* alarm_mask, rtc_calend
     } else {
         alarm_subsec_reg = (uint32_t*)&(RTC->ALARM1_SUBSECOND);
     }
-
+    /*
     if (((alarm_mask->subsecMask != 0) && (time->subsecond >= 1000000)) || (alarm_mask->subsecMask > 15)) {
         return;
     }
+    */
     if (alarm_mask->subsecMask != 0) {
         temp = ((float)(time->subsecond)) / ((float)(((float)RTC_MICROSECOND) / 32768)) + 0.5;
         rtc_check_syn();

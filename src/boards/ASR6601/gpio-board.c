@@ -5,7 +5,7 @@
 //NO SUPPORT FOR AF
 //BSR IS ACTUALLY BSRR
 
-gpio_t* get_gpio_address(uint8_t port_index) {return GPIO_BASE + port_index * 0x400;}
+gpio_t* get_gpio_address(uint8_t port_index) {return (gpio_t*)(GPIO_BASE + port_index * 0x400);}
 
 void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, PinTypes type, uint32_t value) {
   

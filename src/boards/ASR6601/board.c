@@ -8,6 +8,7 @@
 #include "gpio.h"
 #include "board-config.h"
 #include "lpm-board.h"
+#include "rtc-board.h"
 #include "uart.h"
 
 Gpio_t Led1; //PA4
@@ -42,3 +43,4 @@ void BoardCriticalSectionBegin(uint32_t *mask) {
 void BoardCriticalSectionEnd(uint32_t *mask) {
   __set_PRIMASK( *mask );
 }
+

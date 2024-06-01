@@ -1,6 +1,5 @@
 
 #include "tremo_it.h"
-#include "rtc-board.h"
 //extern void RadioOnDioIrq(void);
 extern void RtcOnIrq(void);
 
