@@ -9,13 +9,40 @@
 #include "board-config.h"
 #include "lpm-board.h"
 #include "rtc-board.h"
+#include "sx126x-board.h"
 #include "uart.h"
-
+#include <stdio.h>
 Gpio_t Led1; //PA4
 Gpio_t Led2; //PA5
+Uart_t Uart0; //PB0 PB1
+Gpio_t LoraRfswCtrl; //PD11
+Gpio_t LoraRfswVdd; //PA10
 
-Uart_t Uart0;
+void LoraInit() {
+    rcc_enable_peripheral_clk(RCC_PERIPHERAL_LORA, false);
+    rcc_rst_peripheral(RCC_PERIPHERAL_LORA, true);
+    rcc_rst_peripheral(RCC_PERIPHERAL_LORA, false);
+    rcc_enable_peripheral_clk(RCC_PERIPHERAL_LORA, true);
 
+    LORAC->CR0 = 0x00000200; //pins for RF TRx from internal SSP 
+
+    LORAC->SSP_CR0 = 0x07; //8 bit data width
+    LORAC->SSP_CPSR = 0x02; //Fsspclkout prescaler = 2
+
+    //wakeup lora 
+    //avoid always waiting busy after main reset or soft reset
+    if(LORAC->CR1 != 0x80) //select / deselect if not POR_BAT
+    {
+        delay_us(20);
+        LORAC->NSS_CR = 0;
+        delay_us(110);
+        LORAC->NSS_CR = 1;
+    }
+    
+    LORAC->SSP_CR1 = 0x02; //enable CLK_32M_EN_BAT
+    NVIC_EnableIRQ(LORA_IRQn);
+    SX126xIoInit();
+}
 void BoardInitMcu() {  
   GpioInit(&Led1, PA_4, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
   GpioInit(&Led1, PA_5, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
@@ -23,7 +50,7 @@ void BoardInitMcu() {
   UartConfig(&Uart0, RX_TX, UART_BAUDRATE_115200, UART_8_BIT, UART_1_STOP_BIT, NO_PARITY, NO_FLOW_CTRL);
   rcc_enable_peripheral_clk(RCC_PERIPHERAL_PWR, true);
   rcc_enable_peripheral_clk(RCC_PERIPHERAL_SAC, true);
-  SX126xLoracInit();
+  LoraInit();
   RtcInit();
   delay_init();
 }

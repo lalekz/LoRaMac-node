@@ -162,7 +162,6 @@ int main( void )
     Radio.Init(&RadioEvents);
     Radio.SetChannel(RF_FREQUENCY);
 #if defined( USE_MODEM_LORA )
-
     Radio.SetTxConfig( MODEM_LORA, TX_OUTPUT_POWER, 0, LORA_BANDWIDTH,
                                    LORA_SPREADING_FACTOR, LORA_CODINGRATE,
                                    LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
@@ -193,13 +192,14 @@ int main( void )
     #error "Please define a frequency band in the compiler options."
 #endif
 
+   
     Radio.Rx( RX_TIMEOUT_VALUE );
-
     while( 1 )
     {
         switch( State )
         {
         case RX:
+
             if( isMaster == true )
             {
                 if( BufferSize > 0 )
@@ -277,7 +277,6 @@ int main( void )
             break;
         case RX_TIMEOUT:
         case RX_ERROR:
-            printf("error\n");
             if( isMaster == true )
             {
                 // Send the next PING frame
@@ -319,12 +318,14 @@ int main( void )
 
 void OnTxDone( void )
 {
+    printf("tx done\n");
     Radio.Sleep( );
     State = TX;
 }
 
 void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
 {
+    printf("rx done\n");
     Radio.Sleep( );
     BufferSize = size;
     memcpy( Buffer, payload, BufferSize );
@@ -335,18 +336,21 @@ void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
 
 void OnTxTimeout( void )
 {
+    printf("tx timeout\n");
     Radio.Sleep( );
     State = TX_TIMEOUT;
 }
 
 void OnRxTimeout( void )
 {
+    printf("rx timeout\n");
     Radio.Sleep( );
     State = RX_TIMEOUT;
 }
 
 void OnRxError( void )
 {
+    printf("rx error\n");
     Radio.Sleep( );
     State = RX_ERROR;
 }

@@ -199,26 +199,13 @@ static TimerTime_t RtcConvertCalendarTickToTimerTime(RtcCalendar_t *calendar) {
 
     timeCounter = timeCounterTemp*1000 + now.CalendarTime.subsecond / 1000;
 
-    return (timeCounter);
+    return timeCounter;
 }
 
 static RtcCalendar_t RtcGetCalendar() {
     RtcCalendar_t now;
     rtc_get_calendar(&now.CalendarTime);
-    return(now);
-}
-
-void RtcOnIrq() {
-    uint8_t intr_stat;
-    intr_stat =  rtc_get_status(RTC_CYC_SR);
- 
-    if(intr_stat == true) {
-        rtc_cyc_cmd(DISABLE);
-        rtc_config_interrupt(RTC_CYC_IT, DISABLE); // disable
-        rtc_set_status(RTC_CYC_SR, false); // clear
-        TimerIrqHandler();
-        rtc_config_interrupt(RTC_CYC_IT, ENABLE); // enable
-    }
+    return now;
 }
 
 void RtcProcess()
@@ -226,12 +213,12 @@ void RtcProcess()
     // Not used on this platform.
 }
 
-void RtcBoardIrqHandler(void) {
+void RtcOnIrq(void) {
     if (rtc_get_status(RTC_CYC_SR)) {
         rtc_config_interrupt(RTC_CYC_IT, DISABLE);
         rtc_set_status(RTC_CYC_SR, false);
-        rtc_config_interrupt(RTC_CYC_IT, ENABLE);
         TimerIrqHandler();
+        rtc_config_interrupt(RTC_CYC_IT, ENABLE);
     }
 }
 

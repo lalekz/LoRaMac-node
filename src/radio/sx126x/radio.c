@@ -29,6 +29,8 @@
 #include "sx126x.h"
 #include "sx126x-board.h"
 #include "board.h"
+#include <stdio.h>
+#include "tremo_regs.h"
 /*!
  * \brief Initializes the radio
  *
@@ -1252,12 +1254,11 @@ void RadioIrqProcess( void )
     const bool isIrqFired = IrqFired;
     IrqFired = false;
     CRITICAL_SECTION_END( );
-
     if( isIrqFired == true )
     {
         uint16_t irqRegs = SX126xGetIrqStatus( );
         SX126xClearIrqStatus( irqRegs );
-
+        
         // Check if DIO1 pin is High. If it is the case revert IrqFired to true
         CRITICAL_SECTION_BEGIN_REPEAT( );
         if( SX126xGetDio1PinState( ) == 1 )
@@ -1265,7 +1266,6 @@ void RadioIrqProcess( void )
             IrqFired = true;
         }
         CRITICAL_SECTION_END( );
-
         if( ( irqRegs & IRQ_TX_DONE ) == IRQ_TX_DONE )
         {
             TimerStop( &TxTimeoutTimer );

@@ -1,7 +1,9 @@
 
 #include "tremo_it.h"
-//extern void RadioOnDioIrq(void);
-
+#include "stdio.h"
+#include "tremo_regs.h"
+extern void RadioOnDioIrq(void);
+extern void RtcOnIrq(void);
 /**
   * @brief  This function handles NMI exception.
   * @param  None
@@ -103,12 +105,11 @@ void LORA_IRQHandler()
 */
 void RTC_IRQHandler(void)
 {
-    RtcBoardIrqHandler();
+    RtcOnIrq();
 }
 
-void LORA_IRQHandler()
-{
-    LoraBoardIrqHandler();
+void LORA_IRQHandler() {
+  RadioOnDioIrq();
 }
 /******************************************************************************/
 /*                 Tremo Peripherals Interrupt Handlers                   */

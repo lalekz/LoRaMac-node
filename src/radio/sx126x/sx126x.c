@@ -27,7 +27,7 @@
 #include "delay.h"
 #include "sx126x.h"
 #include "sx126x-board.h"
-
+#include <stdio.h>
 /*!
  * \brief Internal frequency of the radio
  */
@@ -139,6 +139,7 @@ void SX126xCheckDeviceReady( void )
         // Switch is turned off when device is in sleep mode and turned on is all other modes
         SX126xAntSwOn( );
     }
+    
     SX126xWaitOnBusy( );
 }
 
@@ -472,8 +473,9 @@ void SX126xSetDioIrqParams( uint16_t irqMask, uint16_t dio1Mask, uint16_t dio2Ma
 uint16_t SX126xGetIrqStatus( void )
 {
     uint8_t irqStatus[2];
-
+    
     SX126xReadCommand( RADIO_GET_IRQSTATUS, irqStatus, 2 );
+
     return ( irqStatus[0] << 8 ) | irqStatus[1];
 }
 
