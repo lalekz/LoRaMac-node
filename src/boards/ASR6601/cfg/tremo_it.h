@@ -16,6 +16,7 @@ void SysTick_Handler(void);
 void RTC_IRQHandler(void);
 
 void RtcBoardIrqHandler(void);
+void LoraBoardIrqHandler(void);
 #ifdef __cplusplus
 }
 #endif

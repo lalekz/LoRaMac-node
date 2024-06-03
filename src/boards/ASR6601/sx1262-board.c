@@ -5,6 +5,7 @@
 #include "tremo_regs.h"
 #include "tremo_delay.h"
 #include "tremo_rtc.h"
+#include "tremo_it.h"
 #include "board-config.h"
 #include "delay.h"
 #include "radio.h"
@@ -66,13 +67,9 @@ void SX126xLoracInit()
 }
 
 
-uint32_t SX126xGetBoardTcxoWakeupTime( void )
-{
-    return BOARD_TCXO_WAKEUP_TIME;
-}
+uint32_t SX126xGetBoardTcxoWakeupTime() {return BOARD_TCXO_WAKEUP_TIME;}
 
-void SX126xReset( void )
-{
+void SX126xReset() {
     LORAC->CR1 &= ~(1<<5);  //nreset
     delay_us(100);
     LORAC->CR1 |= 1<<5;    //nreset release
@@ -80,17 +77,15 @@ void SX126xReset( void )
     LORAC->CR0 |= 1<<5; //irq0
     LORAC->CR1 |= 0x1;  //tcxo
     
-    while((LORAC->SR & 0x100));  
+    while((LORAC->SR) & 0x100);  
 }
 
-void SX126xWaitOnBusy( void )
-{
+void SX126xWaitOnBusy() {
     delay_us(10);
-    while( LORAC->SR & 0x100 );
+    while((LORAC->SR) & 0x100);
 }
 
-void SX126xWakeup( void )
-{
+void SX126xWakeup( void ) {
     __disable_irq();
 
     LORAC->NSS_CR = 0;
@@ -269,4 +264,8 @@ void SX126xIoRfSwitchInit() {
 
 void SX126xIoIrqInit(DioIrqHandler dioIrq) {
 
+}
+
+void LoraBoardIrqHandler() {
+    
 }

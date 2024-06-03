@@ -21,6 +21,9 @@ void BoardInitMcu() {
   GpioInit(&Led1, PA_5, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
   UartInit(&Uart0, UART_USB_CDC, PB_1, PB_0);
   UartConfig(&Uart0, RX_TX, UART_BAUDRATE_115200, UART_8_BIT, UART_1_STOP_BIT, NO_PARITY, NO_FLOW_CTRL);
+  rcc_enable_peripheral_clk(RCC_PERIPHERAL_PWR, true);
+  rcc_enable_peripheral_clk(RCC_PERIPHERAL_SAC, true);
+  SX126xLoracInit();
   RtcInit();
   delay_init();
 }

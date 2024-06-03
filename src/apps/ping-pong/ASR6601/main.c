@@ -159,7 +159,6 @@ int main( void )
     RadioEvents.TxTimeout = OnTxTimeout;
     RadioEvents.RxTimeout = OnRxTimeout;
     RadioEvents.RxError = OnRxError;
-
     Radio.Init(&RadioEvents);
     Radio.SetChannel(RF_FREQUENCY);
 #if defined( USE_MODEM_LORA )

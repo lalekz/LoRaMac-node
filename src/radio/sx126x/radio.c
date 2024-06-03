@@ -29,7 +29,6 @@
 #include "sx126x.h"
 #include "sx126x-board.h"
 #include "board.h"
-
 /*!
  * \brief Initializes the radio
  *
@@ -520,7 +519,6 @@ static uint8_t RadioGetFskBandwidthRegValue( uint32_t bandwidth )
 void RadioInit( RadioEvents_t *events )
 {
     RadioEvents = events;
-
     SX126xInit( RadioOnDioIrq );
     SX126xSetStandby( STDBY_RC );
     SX126xSetRegulatorMode( USE_DCDC );
