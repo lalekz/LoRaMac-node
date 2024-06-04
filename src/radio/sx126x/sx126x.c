@@ -27,7 +27,6 @@
 #include "delay.h"
 #include "sx126x.h"
 #include "sx126x-board.h"
-#include <stdio.h>
 /*!
  * \brief Internal frequency of the radio
  */

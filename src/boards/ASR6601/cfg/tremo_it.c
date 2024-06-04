@@ -1,11 +1,6 @@
 
 #include "tremo_it.h"
-#include <stdio.h>
-#include "tremo_regs.h"
-#include "sx126x.h"
 
-extern RadioOperatingModes_t SX126xGetOperatingMode(void);
-extern uint16_t SX126xGetIrqStatus( void );
 extern void RadioOnDioIrq(void);
 extern void RadioIrqProcess();
 extern void RtcOnIrq(void);

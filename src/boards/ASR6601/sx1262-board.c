@@ -10,7 +10,6 @@
 #include "delay.h"
 #include "radio.h"
 #include "sx126x-board.h"
-#include <stdio.h>
 #define BOARD_TCXO_WAKEUP_TIME 5
 
 extern Gpio_t LoraRfswCtrl;

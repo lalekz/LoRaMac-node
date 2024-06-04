@@ -29,8 +29,6 @@
 #include "sx126x.h"
 #include "sx126x-board.h"
 #include "board.h"
-#include <stdio.h>
-#include "tremo_regs.h"
 /*!
  * \brief Initializes the radio
  *

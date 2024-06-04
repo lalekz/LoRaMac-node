@@ -11,7 +11,7 @@
 #include "rtc-board.h"
 #include "sx126x-board.h"
 #include "uart.h"
-#include <stdio.h>
+
 Gpio_t Led1; //PA4
 Gpio_t Led2; //PA5
 Uart_t Uart0; //PB0 PB1
