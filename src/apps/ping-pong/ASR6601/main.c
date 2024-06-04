@@ -318,14 +318,12 @@ int main( void )
 
 void OnTxDone( void )
 {
-    printf("tx done\n");
     Radio.Sleep( );
     State = TX;
 }
 
 void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
 {
-    printf("rx done\n");
     Radio.Sleep( );
     BufferSize = size;
     memcpy( Buffer, payload, BufferSize );

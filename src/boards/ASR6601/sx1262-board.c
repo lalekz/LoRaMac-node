@@ -15,8 +15,7 @@
 
 extern Gpio_t LoraRfswCtrl;
 extern Gpio_t LoraRfswVdd;
-extern void RadioOnDioIrq();
-extern void RadioIrqProcess();
+
 uint8_t gPaOptSetting = 0;
 RadioOperatingModes_t operatingMode;
 
@@ -190,11 +189,11 @@ void SX126xSetRfTxPower(int8_t power) { SX126xSetTxParams(power, RADIO_RAMP_40_U
 uint8_t SX126xGetPaSelect(uint32_t channel) { return SX1262; }
 
 void SX126xAntSwOn() {
-    GpioInit(&LoraRfswCtrl, PA_10, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_UP, 0);
+    GpioInit(&LoraRfswVdd, PA_10, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_UP, 0);
 }
 
 void SX126xAntSwOff() {
-    GpioInit(&LoraRfswCtrl, PA_10, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
+    GpioInit(&LoraRfswVdd, PA_10, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
 }
 
 uint8_t SX126xGetPaOpt() { return gPaOptSetting; }
@@ -210,7 +209,8 @@ bool SX126xCheckRfFrequency(uint32_t frequency) {
     return true;
 }
 
-uint8_t SX126xGetDeviceId() { return SX1262; }
+uint8_t SX126xGetDeviceId() {return SX1262;}
+
 
 uint32_t SX126xGetDio1PinState()
 {
@@ -222,11 +222,18 @@ void SX126xSetOperatingMode(RadioOperatingModes_t mode) {operatingMode = mode;}
 
 RadioOperatingModes_t SX126xGetOperatingMode() {return operatingMode;}
 
-void SX126xIoTcxoInit() {
-    SX126xSetDio3AsTcxoCtrl(TCXO_CTRL_1_7V, BOARD_TCXO_WAKEUP_TIME << 6);
+void SX126xIoTcxoInit() { /*
+    CalibrationParams_t calibParam;
+
+    SX126xSetDio3AsTcxoCtrl( TCXO_CTRL_1_7V, SX126xGetBoardTcxoWakeupTime( ) << 6 ); // convert from ms to SX126x time base
+    calibParam.Value = 0x7F;
+    SX126xCalibrate( calibParam );
+    */
 }
 
-void SX126xIoRfSwitchInit() { SX126xSetDio2AsRfSwitchCtrl(true); }
+void SX126xIoRfSwitchInit() {
+    SX126xSetDio2AsRfSwitchCtrl(true);
+}
 
 void SX126xIoInit() {
     GpioInit(&LoraRfswCtrl, PD_11, PIN_ALTERNATE_FCT, PIN_PUSH_PULL, PIN_PULL_DOWN, 3);

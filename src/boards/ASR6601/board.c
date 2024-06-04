@@ -18,7 +18,7 @@ Uart_t Uart0; //PB0 PB1
 Gpio_t LoraRfswCtrl; //PD11
 Gpio_t LoraRfswVdd; //PA10
 
-void LoraInit() {
+void LoracInit() {
     rcc_enable_peripheral_clk(RCC_PERIPHERAL_LORA, false);
     rcc_rst_peripheral(RCC_PERIPHERAL_LORA, true);
     rcc_rst_peripheral(RCC_PERIPHERAL_LORA, false);
@@ -38,8 +38,9 @@ void LoraInit() {
         delay_us(110);
         LORAC->NSS_CR = 1;
     }
-    
-    LORAC->SSP_CR1 = 0x02; //enable CLK_32M_EN_BAT
+  
+    LORAC->SSP_CR1 = 0x02;
+
     NVIC_EnableIRQ(LORA_IRQn);
     SX126xIoInit();
 }
@@ -50,7 +51,7 @@ void BoardInitMcu() {
   UartConfig(&Uart0, RX_TX, UART_BAUDRATE_115200, UART_8_BIT, UART_1_STOP_BIT, NO_PARITY, NO_FLOW_CTRL);
   rcc_enable_peripheral_clk(RCC_PERIPHERAL_PWR, true);
   rcc_enable_peripheral_clk(RCC_PERIPHERAL_SAC, true);
-  LoraInit();
+  LoracInit();
   RtcInit();
   delay_init();
 }

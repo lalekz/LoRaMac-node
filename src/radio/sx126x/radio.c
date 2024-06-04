@@ -527,7 +527,7 @@ void RadioInit( RadioEvents_t *events )
 
     SX126xSetBufferBaseAddress( 0x00, 0x00 );
     SX126xSetTxParams( 0, RADIO_RAMP_200_US );
-    SX126xSetDioIrqParams( IRQ_RADIO_ALL, IRQ_RADIO_ALL, IRQ_RADIO_NONE, IRQ_RADIO_NONE );
+    SX126xSetDioIrqParams( IRQ_RADIO_NONE, IRQ_RADIO_NONE, IRQ_RADIO_NONE, IRQ_RADIO_NONE );
 
     // Add registers to the retention list (4 is the maximum possible number)
     RadioAddRegisterToRetentionList( REG_RX_GAIN );
@@ -1063,8 +1063,8 @@ void RadioStandby( void )
 
 void RadioRx( uint32_t timeout )
 {
-    SX126xSetDioIrqParams( IRQ_RADIO_ALL, //IRQ_RX_DONE | IRQ_RX_TX_TIMEOUT,
-                           IRQ_RADIO_ALL, //IRQ_RX_DONE | IRQ_RX_TX_TIMEOUT,
+    SX126xSetDioIrqParams( IRQ_RX_DONE | IRQ_RX_TX_TIMEOUT,
+                           IRQ_RX_DONE | IRQ_RX_TX_TIMEOUT,
                            IRQ_RADIO_NONE,
                            IRQ_RADIO_NONE );
 
@@ -1086,8 +1086,8 @@ void RadioRx( uint32_t timeout )
 
 void RadioRxBoosted( uint32_t timeout )
 {
-    SX126xSetDioIrqParams( IRQ_RADIO_ALL, //IRQ_RX_DONE | IRQ_RX_TX_TIMEOUT,
-                           IRQ_RADIO_ALL, //IRQ_RX_DONE | IRQ_RX_TX_TIMEOUT,
+    SX126xSetDioIrqParams( IRQ_RX_DONE | IRQ_RX_TX_TIMEOUT,
+                           IRQ_RX_DONE | IRQ_RX_TX_TIMEOUT,
                            IRQ_RADIO_NONE,
                            IRQ_RADIO_NONE );
 
@@ -1251,7 +1251,7 @@ void RadioIrqProcess( void )
 {
     CRITICAL_SECTION_BEGIN( );
     // Clear IRQ flag
-    const bool isIrqFired = IrqFired;
+    bool isIrqFired = IrqFired;
     IrqFired = false;
     CRITICAL_SECTION_END( );
     if( isIrqFired == true )
