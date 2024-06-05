@@ -17,6 +17,7 @@ Gpio_t Led2; //PA5
 Uart_t Uart0; //PB0 PB1
 Gpio_t LoraRfswCtrl; //PD11
 Gpio_t LoraRfswVdd; //PA10
+Spi_t Spi1;
 
 void LoracInit() {
     rcc_enable_peripheral_clk(RCC_PERIPHERAL_LORA, false);
@@ -53,6 +54,9 @@ void BoardInitMcu() {
   rcc_enable_peripheral_clk(RCC_PERIPHERAL_SAC, true);
   LoracInit();
   RtcInit();
+  SpiInit(&Spi1, SPI_1, PB_10, PB_11, PB_8, PB_9);
+  SpiFormat(&Spi1, 8, 0, 0, 0);
+  SpiFrequency(&Spi1, 100000);
   delay_init();
 }
 

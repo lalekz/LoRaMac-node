@@ -27,6 +27,7 @@ add_executable(${PROJECT_NAME}
                             ${${PROJECT_NAME}_SOURCES}
                             $<TARGET_OBJECTS:system>
                             $<TARGET_OBJECTS:peripherals>
+                            $<TARGET_OBJECTS:radio>
                             $<TARGET_OBJECTS:${BOARD}>
 )
 
