@@ -235,8 +235,8 @@ elseif(APPLICATION STREQUAL timer)
 
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/timer)
 
-elseif(APPLICATION STREQUAL spi)
+elseif(APPLICATION STREQUAL i2c)
 
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/spi)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/i2c)
 
 endif()
