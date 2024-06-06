@@ -525,7 +525,7 @@ void RadioInit( RadioEvents_t *events )
 
     SX126xSetBufferBaseAddress( 0x00, 0x00 );
     SX126xSetTxParams( 0, RADIO_RAMP_200_US );
-    SX126xSetDioIrqParams( IRQ_RADIO_NONE, IRQ_RADIO_NONE, IRQ_RADIO_NONE, IRQ_RADIO_NONE );
+    SX126xSetDioIrqParams( IRQ_RADIO_ALL, IRQ_RADIO_ALL, IRQ_RADIO_NONE, IRQ_RADIO_NONE );
 
     // Add registers to the retention list (4 is the maximum possible number)
     RadioAddRegisterToRetentionList( REG_RX_GAIN );
