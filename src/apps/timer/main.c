@@ -2,7 +2,6 @@
 #include "board.h"
 #include "gpio.h"
 #include "timer.h"
-#include "tremo_regs.h"
 
 TimerEvent_t timer;
 
@@ -19,7 +18,7 @@ int main(){
     TimerInit(&timer, callback);
     TimerSetValue(&timer, 1000);
     TimerStart(&timer);
-    printf("timer set: %ld\n", RTC->CYC_MAX);
     while(1){
     }
 }
+

@@ -45,6 +45,7 @@ void LoracInit() {
     NVIC_EnableIRQ(LORA_IRQn);
     SX126xIoInit();
 }
+
 void BoardInitMcu() {  
   GpioInit(&Led1, PA_4, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
   GpioInit(&Led1, PA_5, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
