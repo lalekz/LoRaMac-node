@@ -9,7 +9,6 @@ void callback(){
     printf("Hello world!\n");
     TimerSetValue(&timer, 1000);
     TimerStart(&timer);
-    BoardLowPowerHandler();
 }
 
 int main(){
@@ -19,8 +18,7 @@ int main(){
     TimerInit(&timer, callback);
     TimerSetValue(&timer, 1000);
     TimerStart(&timer);
-    BoardLowPowerHandler();
-    while(1){
-    }
+    while(1)
+        BoardLowPowerHandler();
 }
 
