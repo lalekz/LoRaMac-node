@@ -1,9 +1,9 @@
 
 #include "tremo_it.h"
 
-extern void RadioOnDioIrq(void);
-extern void RadioIrqProcess();
-extern void RtcOnIrq(void);
+void RadioOnDioIrq(void);
+void RadioIrqProcess();
+void RtcOnIrq(void);
 
 /**
  * @brief  This function handles NMI exception.
