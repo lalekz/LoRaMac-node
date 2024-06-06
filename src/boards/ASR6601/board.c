@@ -59,6 +59,7 @@ void BoardInitMcu() {
   SpiFormat(&Spi1, 8, 0, 0, 0);
   SpiFrequency(&Spi1, 100000);
   delay_init();
+  LpmSetOffMode(LPM_UART_TX_ID, DISABLE);
 }
 
 void BoardInitPeriph() {

@@ -91,8 +91,7 @@ void SysTick_Handler(void)
  * @param  None
  * @retval None
  */
-void PWR_IRQHandler()
-{
+void PWR_IRQHandler() {
 }
 
 /******************************************************************************/

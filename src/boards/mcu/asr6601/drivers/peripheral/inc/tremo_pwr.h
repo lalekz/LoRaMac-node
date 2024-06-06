@@ -20,6 +20,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "tremo_regs.h"
 
 #define PWR_LP_MODE_STOP0   ((uint32_t)0x00000000)  /*!< STOP0 Mode */
