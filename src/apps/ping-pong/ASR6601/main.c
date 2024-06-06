@@ -5,6 +5,7 @@
 #include "delay.h"
 #include "timer.h"
 #include "radio.h"
+#include "board-periph.h"
 
 #if defined( REGION_AS923 )
 
@@ -109,12 +110,6 @@ int8_t SnrValue = 0;
  * Radio events function pointer
  */
 static RadioEvents_t RadioEvents;
-
-/*!
- * LED GPIO pins objects
- */
-extern Gpio_t Led1;
-extern Gpio_t Led2;
 
 /*!
  * \brief Function to be executed on Radio Tx Done event

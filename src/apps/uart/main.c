@@ -2,11 +2,7 @@
 #include "board.h"
 #include "delay.h"
 #include "gpio.h"
-
-/**
- * Main application entry point.
- */
-extern Gpio_t Led1;
+#include "board-periph.h"
 
 int main(){
     // Target board initialization

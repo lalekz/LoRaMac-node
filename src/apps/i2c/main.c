@@ -1,9 +1,8 @@
 #include "i2c-board.h"
 #include "board.h"
 #include "delay.h"
+#include "board-periph.h"
 #include <stdio.h>
-
-extern I2c_t I2c1;
 
 int main(){
     uint8_t cmd[] = {0x24, 0x00};

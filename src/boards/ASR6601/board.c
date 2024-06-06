@@ -6,7 +6,7 @@
 #include "tremo_delay.h"
 #include "utilities.h"
 #include "gpio.h"
-#include "board-config.h"
+#include "board-periph.h"
 #include "lpm-board.h"
 #include "rtc-board.h"
 #include "sx126x-board.h"
@@ -20,7 +20,7 @@ Gpio_t LoraRfswVdd; //PA10
 
 Uart_t Uart0; //PB0 PB1
 Spi_t Spi1; //PB10 PB11 PB8 PB9
-I2c_t I2c1; //PB14 PB15
+I2c_t I2c1; //PB14 PB15s
 
 void LoracInit() {
     rcc_enable_peripheral_clk(RCC_PERIPHERAL_LORA, false);
