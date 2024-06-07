@@ -25,4 +25,5 @@ tmp/
 .directory
 .vscode/*
 .cmaketools.json
+make.sh
 ipch/

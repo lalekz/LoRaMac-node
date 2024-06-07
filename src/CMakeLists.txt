@@ -188,7 +188,7 @@ elseif(BOARD STREQUAL ASR6601)
     # Configure toolchain for ASR6601
     set(LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/boards/ASR6601/cfg/gcc.ld)
     include(asr6601)
-    
+    set(RADIO sx126x CACHE INTERNAL "Radio sx126x selected")
     # Build platform specific board implementation
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/boards/ASR6601)
 endif()
@@ -230,5 +230,13 @@ elseif(APPLICATION STREQUAL tx-cw)
 elseif(APPLICATION STREQUAL uart)
 
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/uart)
+
+elseif(APPLICATION STREQUAL timer)
+
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/timer)
+
+elseif(APPLICATION STREQUAL i2c)
+
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/i2c)
 
 endif()

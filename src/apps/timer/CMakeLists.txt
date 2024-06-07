@@ -15,7 +15,7 @@
 ## License:  Revised BSD License, see LICENSE.TXT file included in the project
 ## Authors:  Johannes Bruder (STACKFORCE), Miguel Luis (Semtech)
 ##
-project(uart)
+project(timer)
 cmake_minimum_required(VERSION 3.6)
 
 #---------------------------------------------------------------------------------------
@@ -27,7 +27,6 @@ add_executable(${PROJECT_NAME}
                             ${${PROJECT_NAME}_SOURCES}
                             $<TARGET_OBJECTS:system>
                             $<TARGET_OBJECTS:peripherals>
-                            $<TARGET_OBJECTS:radio>
                             $<TARGET_OBJECTS:${BOARD}>
 )
 

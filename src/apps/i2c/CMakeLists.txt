@@ -15,68 +15,24 @@
 ## License:  Revised BSD License, see LICENSE.TXT file included in the project
 ## Authors:  Johannes Bruder (STACKFORCE), Miguel Luis (Semtech)
 ##
-project(ping-pong)
+project(i2c)
 cmake_minimum_required(VERSION 3.6)
-
-#---------------------------------------------------------------------------------------
-# Options
-#---------------------------------------------------------------------------------------
-
-# Allow selection of region
-option(REGION_EU868 "Region EU868" OFF)
-option(REGION_US915 "Region US915" OFF)
-option(REGION_CN779 "Region CN779" OFF)
-option(REGION_EU433 "Region EU433" OFF)
-option(REGION_AU915 "Region AU915" OFF)
-option(REGION_AS923 "Region AS923" OFF)
-option(REGION_CN470 "Region CN470" OFF)
-option(REGION_KR920 "Region KR920" OFF)
-option(REGION_IN865 "Region IN865" OFF)
-option(REGION_RU864 "Region RU864" ON)
-set(REGION_LIST REGION_EU868 REGION_US915 REGION_CN779 REGION_EU433 REGION_AU915 REGION_AS923 REGION_CN470 REGION_KR920 REGION_IN865 REGION_RU864)
-
-# Allow switching of modulation
-set(MODULATION_LIST LORA FSK)
-set(MODULATION LORA CACHE STRING "Default modulation is LoRa")
-set_property(CACHE MODULATION PROPERTY STRINGS ${MODEM_LIST})
 
 #---------------------------------------------------------------------------------------
 # Target
 #---------------------------------------------------------------------------------------
 
-file(GLOB ${PROJECT_NAME}_SOURCES "${CMAKE_CURRENT_LIST_DIR}/${BOARD}/*.c")
-
+file(GLOB ${PROJECT_NAME}_SOURCES "${CMAKE_CURRENT_LIST_DIR}/*.c")
 add_executable(${PROJECT_NAME}
                             ${${PROJECT_NAME}_SOURCES}
                             $<TARGET_OBJECTS:system>
-                            $<TARGET_OBJECTS:radio>
                             $<TARGET_OBJECTS:peripherals>
+                            $<TARGET_OBJECTS:radio>
                             $<TARGET_OBJECTS:${BOARD}>
-)
-
-# Loops through all regions and add compile time definitions for the enabled ones.
-foreach( REGION ${REGION_LIST} )
-    if(${REGION})
-        target_compile_definitions(${PROJECT_NAME} PUBLIC -D"${REGION}")
-    endif()
-endforeach()
-
-if(MODULATION STREQUAL LORA)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE USE_MODEM_LORA)
-elseif(MODULATION STREQUAL FSK)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE USE_MODEM_FSK)
-endif()
-
-# Add compile time definition for the mbed shield if set.
-target_compile_definitions(${PROJECT_NAME} PUBLIC -D${MBED_RADIO_SHIELD})
-
-target_compile_definitions(${PROJECT_NAME}  PUBLIC
-    $<BUILD_INTERFACE:$<TARGET_PROPERTY:mac,INTERFACE_COMPILE_DEFINITIONS>>
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:$<TARGET_PROPERTY:system,INTERFACE_INCLUDE_DIRECTORIES>>
-    $<BUILD_INTERFACE:$<TARGET_PROPERTY:radio,INTERFACE_INCLUDE_DIRECTORIES>>
     $<BUILD_INTERFACE:$<TARGET_PROPERTY:peripherals,INTERFACE_INCLUDE_DIRECTORIES>>
     $<BUILD_INTERFACE:$<TARGET_PROPERTY:${BOARD},INTERFACE_INCLUDE_DIRECTORIES>>
 )

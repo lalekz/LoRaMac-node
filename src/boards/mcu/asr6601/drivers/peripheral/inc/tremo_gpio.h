@@ -80,7 +80,7 @@ typedef enum { GPIO_DRIVE_CAPABILITY_4MA = 0, GPIO_DRIVE_CAPABILITY_8MA = 1 } gp
  * @brief The mode of the gpio pin
  */
 typedef enum {
-    GPIO_MODE_INPUT_FLOATING,      /*!< Input floating */
+    GPIO_MODE_INPUT_FLOATING = 0,      /*!< Input floating */
     GPIO_MODE_INPUT_PULL_UP,    /*!< Input pull-up */
     GPIO_MODE_INPUT_PULL_DOWN,  /*!< Input pull-down */
     GPIO_MODE_OUTPUT_PP_HIGH,   /*!< Output push-pull high level */

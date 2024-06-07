@@ -126,12 +126,12 @@ typedef struct {
  * @brief RTC alarm
  */
 typedef struct {
-    bool dayMask;       /*!< day mask*/
     bool weekMask;      /*!< week mask*/
+    bool dayMask;       /*!< day mask*/
     bool hrMask;        /*!< hour mask*/
     bool minMask;       /*!< minute mask*/
     bool secMask;       /*!< second mask*/
-    uint8_t subsecMask; /*!< subsecond mask*/
+    bool subsecMask; /*!< subsecond mask*/
 } rtc_alarm_mask_t;
 
 /**
