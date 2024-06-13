@@ -36,7 +36,8 @@
 #include "secure-element-nvm.h"
 #include "se-identity.h"
 #include "soft-se-hal.h"
-
+#include "systime.h"
+#include <stdio.h>
 static SecureElementNvmData_t* SeNvm;
 
 /*
@@ -445,4 +446,9 @@ SecureElementStatus_t SecureElementSetPin( uint8_t* pin )
 uint8_t* SecureElementGetPin( void )
 {
     return SeNvm->Pin;
+}
+
+void SecureElementRandomNumber(uint32_t* number) {
+    *number = randr( 0, 0x01FFFFFF );
+    printf("rand %ld\n", *number);
 }

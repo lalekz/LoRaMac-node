@@ -1,9 +1,10 @@
 #include "lpm-board.h" 
 #include "board.h"
 #include "tremo_pwr.h"
+#include "tremo_rtc.h"
 
 static uint32_t StopModeDisable = 0;
-static uint32_t OffModeDisable = 0;
+static uint32_t OffModeDisable = 1;
 
 void LpmSetOffMode(LpmId_t id, LpmSetMode_t mode) {
     CRITICAL_SECTION_BEGIN();
@@ -63,22 +64,18 @@ void LpmEnterLowPower() {
 }
 
 void LpmEnterSleepMode() {
-    pwr_sleep_wfe(1);
 }
 
 void LpmExitSleepMode() {
-    pwr_exit_lprun_mode();
 }
 
 void LpmEnterStopMode() {
-    pwr_deepsleep_wfe(PWR_LP_MODE_STOP0);
 }
 
 void LpmExitStopMode() {
 }
 
 void LpmEnterOffMode() {
-    pwr_deepsleep_wfe(PWR_LP_MODE_STANDBY);
 }
 
 void LpmExitOffMode()

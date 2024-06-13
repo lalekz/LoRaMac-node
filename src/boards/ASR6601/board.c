@@ -12,15 +12,19 @@
 #include "sx126x-board.h"
 #include "uart.h"
 #include "i2c-board.h"
+#include "tremo_system.h"
 
 Gpio_t Led1; //PA4
 Gpio_t Led2; //PA5
+Gpio_t Led3; //PA8
 Gpio_t LoraRfswCtrl; //PD11
 Gpio_t LoraRfswVdd; //PA10
+Gpio_t EepromRw; //PC4
 
 Uart_t Uart0; //PB0 PB1
 Spi_t Spi1; //PB10 PB11 PB8 PB9
 I2c_t I2c1; //PB14 PB15s
+I2c_t I2c2; //PC2 PC3
 
 void LoracInit() {
     rcc_enable_peripheral_clk(RCC_PERIPHERAL_LORA, false);
@@ -50,8 +54,11 @@ void LoracInit() {
 }
 
 void BoardInitMcu() {  
+
   GpioInit(&Led1, PA_4, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
-  GpioInit(&Led1, PA_5, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
+  GpioInit(&Led2, PA_5, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
+  GpioInit(&Led3, PA_8, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
+  GpioInit(&EepromRw, PC_4, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_UP, 0);
 
   UartInit(&Uart0, UART_USB_CDC, PB_1, PB_0);
   UartConfig(&Uart0, RX_TX, UART_BAUDRATE_115200, UART_8_BIT, UART_1_STOP_BIT, NO_PARITY, NO_FLOW_CTRL);
@@ -69,8 +76,11 @@ void BoardInitMcu() {
   delay_init();
 
   LpmSetOffMode(LPM_UART_TX_ID, DISABLE);
+
   I2cMcuInit(&I2c1, I2C_1, PB_14, PB_15);
   I2cMcuFormat(&I2c1, MODE_I2C, I2C_DUTY_CYCLE_2, true, I2C_ACK_ADD_7_BIT, 100000);
+  I2cMcuInit(&I2c2, I2C_2, PC_2, PC_3);
+  I2cMcuFormat(&I2c2, MODE_I2C, I2C_DUTY_CYCLE_2, true, I2C_ACK_ADD_7_BIT, 400000);
 }
 
 void BoardInitPeriph() {
@@ -90,5 +100,24 @@ void BoardCriticalSectionBegin(uint32_t *mask) {
 
 void BoardCriticalSectionEnd(uint32_t *mask) {
   __set_PRIMASK( *mask );
+}
+
+void BoardResetMcu() {NVIC_SystemReset();}
+
+uint8_t BoardGetBatteryLevel() {return 0;}
+
+uint32_t BoardGetRandomSeed() {return (EFC->SN_L) ^ (EFC->SN_H);}
+
+void BoardGetUniqueId(uint8_t *id) {
+  uint32_t snl = EFC->SN_L;
+  uint32_t snh = EFC->SN_H;
+  id[7] = (snl + snl) >> 24;
+  id[6] = (snl + snh) >> 16;
+  id[5] = (snl + snh) >> 8;
+  id[4] = (snl + snh);
+  id[3] = snl >> 24;
+  id[2] = snl >> 16;
+  id[1] = snl >> 8;
+  id[0] = snl;
 }
 

@@ -9,6 +9,8 @@
 
 #define MINIMAL_TIMEOUT 5
 #define TICKS_PER_SECOND 32768
+
+uint32_t backup_data_0, backup_data_1;
 /*!
  * Number of seconds in a minute
  */
@@ -152,11 +154,12 @@ TimerTime_t RtcSetTimerContext() {
 TimerTime_t RtcGetTimerContext() {return RtcTimerContext;}
 
 uint32_t RtcGetCalendarTime(uint16_t* milliseconds) {
-    *(milliseconds) = RtcConvertCalendarTickToTimerTime(NULL);
-    return *(milliseconds) / 1000;
+    uint32_t ms = RtcConvertCalendarTickToTimerTime(NULL);
+    *(milliseconds) = ms % 1000; 
+    return ms / 1000;
 }
 
-TimerTime_t RtcGetTimerValue() {return RtcConvertCalendarTickToTimerTime(NULL);}
+TimerTime_t RtcGetTimerValue() {return RtcMs2Tick(RtcConvertCalendarTickToTimerTime(NULL));}
 
 uint32_t RtcGetTimerElapsedTime() {
     return RtcConvertCalendarTickToTimerTime(NULL) - RtcTimerContext;
@@ -222,3 +225,49 @@ void RtcOnIrq(void) {
     }
 }
 
+TimerTime_t RtcTempCompensation( TimerTime_t period, float temperature )
+{
+    float k = RTC_TEMP_COEFFICIENT;
+    float kDev = RTC_TEMP_DEV_COEFFICIENT;
+    float t = RTC_TEMP_TURNOVER;
+    float tDev = RTC_TEMP_DEV_TURNOVER;
+    float interim = 0.0f;
+    float ppm = 0.0f;
+
+    if( k < 0.0f )
+    {
+        ppm = ( k - kDev );
+    }
+    else
+    {
+        ppm = ( k + kDev );
+    }
+    interim = ( temperature - ( t - tDev ) );
+    ppm *=  interim * interim;
+
+    // Calculate the drift in time
+    interim = ( ( float ) period * ppm ) / 1000000.0f;
+    // Calculate the resulting time period
+    interim += period;
+    interim = floor( interim );
+
+    if( interim < 0.0f )
+    {
+        interim = ( float )period;
+    }
+
+    // Calculate the resulting period
+    return ( TimerTime_t ) interim;
+}
+
+void RtcBkupWrite( uint32_t data0, uint32_t data1 )
+{
+    backup_data_0 = data0;
+    backup_data_1 = data1;
+}
+
+void RtcBkupRead( uint32_t *data0, uint32_t *data1 )
+{
+    *data0 = backup_data_0;
+    *data1 = backup_data_1;
+}

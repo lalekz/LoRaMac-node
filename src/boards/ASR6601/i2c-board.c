@@ -2,7 +2,6 @@
 #include "i2c-board.h"
 #include "tremo_i2c.h"
 #include "board.h"
-#include "utilities.h"
 
 static I2cAddrSize I2cInternalAddrSize = I2C_ADDR_SIZE_8;
 
@@ -99,13 +98,17 @@ LmnStatus_t I2cMcuWriteMemBuffer(I2c_t *obj, uint8_t deviceAddr, uint16_t addr, 
   i2c_t* i2c = get_i2c_address(obj->I2cId);
   i2c_master_send_start(i2c, deviceAddr, I2C_WRITE);
   i2c_wait_send(i2c);
-  i2c_send_data(i2c, addr);
+  i2c_send_data(i2c, (addr >> 8) & 0xFF);
   i2c_wait_send(i2c);
+  i2c_send_data(i2c, addr & 0xFF);
+  i2c_wait_send(i2c);
+  
   for(i = 0; i < size; i++) {
     i2c_send_data(i2c, buffer[i]);
     i2c_wait_send(i2c);
   }
-  i2c_master_send_stop(i2c); 
+  
+  i2c_master_send_stop(i2c);
   return LMN_STATUS_OK;
 }
 
@@ -114,7 +117,9 @@ LmnStatus_t I2cMcuReadMemBuffer( I2c_t *obj, uint8_t deviceAddr, uint16_t addr, 
   i2c_t* i2c = get_i2c_address(obj->I2cId);
   i2c_master_send_start(i2c, deviceAddr, I2C_WRITE);
   i2c_wait_send(i2c);
-  i2c_send_data(i2c, addr);
+  i2c_send_data(i2c, (addr >> 8) & 0xFF);
+  i2c_wait_send(i2c);
+  i2c_send_data(i2c, addr & 0xFF);
   i2c_wait_send(i2c);
   i2c_master_send_start(i2c, deviceAddr, I2C_READ);
   i2c_wait_send(i2c);

@@ -1,9 +1,6 @@
 #include "gpio-board.h"
 #include "tremo_gpio.h"
 #include "tremo_rcc.h"
-//ACHTUNG
-//NO SUPPORT FOR AF
-//BSR IS ACTUALLY BSRR
 
 gpio_t* get_gpio_address(uint8_t port_index) {return (gpio_t*)(GPIO_BASE + port_index * 0x400);}
 
@@ -18,7 +15,6 @@ void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, Pi
   obj->port = port;
   obj->pin = pin;
   obj->pull = type;
-  
   if(!(RCC->CGR0 & (RCC_CGR0_IOM0_CLK_EN_MASK >> port_index)))
     RCC->CGR0 |= (RCC_CGR0_IOM0_CLK_EN_MASK >> port_index);
   
@@ -28,7 +24,7 @@ void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, Pi
       
       break;
     case PIN_OUTPUT:
-      port->OER |= 1 << pin_index;
+      port->OER &= ~(1 << pin_index);
       break;
 
     case PIN_ALTERNATE_FCT:
@@ -40,7 +36,6 @@ void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, Pi
         port->PER &= ~(1 << pin_index);
       break;
   }
-
   switch(config) {
     case PIN_PUSH_PULL:
       break;
