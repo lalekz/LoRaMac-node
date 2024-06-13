@@ -4,7 +4,7 @@
 #include "tremo_rtc.h"
 
 static uint32_t StopModeDisable = 0;
-static uint32_t OffModeDisable = 1;
+static uint32_t OffModeDisable = 0;
 
 void LpmSetOffMode(LpmId_t id, LpmSetMode_t mode) {
     CRITICAL_SECTION_BEGIN();
