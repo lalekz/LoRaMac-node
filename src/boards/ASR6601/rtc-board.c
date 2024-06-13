@@ -10,6 +10,7 @@
 #define MINIMAL_TIMEOUT 5
 #define TICKS_PER_SECOND 32768
 
+
 uint32_t backup_data_0, backup_data_1;
 /*!
  * Number of seconds in a minute
