@@ -3,12 +3,9 @@
 #include "tremo_pwr.h"
 #include "tremo_rtc.h"
 #include "rtc-board.h"
-#include "radio.h"
 
 static uint32_t StopModeDisable = 0;
 static uint32_t OffModeDisable = 0;
-
-extern const struct Radio_s Radio;
 
 void LpmSetOffMode(LpmId_t id, LpmSetMode_t mode) {
     CRITICAL_SECTION_BEGIN();
@@ -80,10 +77,6 @@ void LpmExitStopMode() {
 }
 
 void LpmEnterOffMode() {
-    if(Radio.GetStatus() != RF_IDLE) 
-        return;
-    rtc_check_syn();
-    pwr_deepsleep_wfi(PWR_LP_MODE_STOP3);
 }
 
 void LpmExitOffMode()
