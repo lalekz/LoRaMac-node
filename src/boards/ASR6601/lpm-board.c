@@ -3,7 +3,6 @@
 #include "tremo_pwr.h"
 #include "tremo_rtc.h"
 #include "rtc-board.h"
-#include <stdio.h>
 #include "radio.h"
 
 static uint32_t StopModeDisable = 0;
