@@ -1,4 +1,9 @@
 #include "board.h"
+#include "board-periph.h"
+#include "i2c-board.h"
+#include "lpm-board.h"
+#include "rtc-board.h"
+#include "sx126x-board.h"
 #include "tremo_cm4.h"
 #include "tremo_uart.h"
 #include "tremo_gpio.h"
@@ -6,13 +11,8 @@
 #include "tremo_delay.h"
 #include "utilities.h"
 #include "gpio.h"
-#include "board-periph.h"
-#include "lpm-board.h"
-#include "rtc-board.h"
-#include "sx126x-board.h"
 #include "uart.h"
-#include "i2c-board.h"
-#include "tremo_system.h"
+
 
 Gpio_t Led1; //PA4
 Gpio_t Led2; //PA5
