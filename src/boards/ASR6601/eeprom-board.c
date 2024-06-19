@@ -11,5 +11,3 @@ LmnStatus_t EepromMcuGetDeviceAddr() {
   while(1);
   return 0;
 }
-
-
