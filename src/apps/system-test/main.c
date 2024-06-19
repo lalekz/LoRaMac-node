@@ -7,14 +7,16 @@
 
 TimerEvent_t timer;
 
-void callback(){
+void callback()
+{
     printf("Woke up. Battery level: %d\n", BoardGetBatteryLevel());
     GpioToggle(&Led1);
     TimerSetValue(&timer, 200);
     TimerStart(&timer);
 }
 
-int main(){
+int main()
+{
     // Target board initialization
     BoardInitMcu();
     BoardInitPeriph();

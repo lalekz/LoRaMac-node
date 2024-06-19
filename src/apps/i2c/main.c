@@ -4,7 +4,8 @@
 #include "board-periph.h"
 #include <stdio.h>
 
-int main(){
+int main()
+{
     uint8_t cmd[] = {0x24, 0x00};
     uint8_t buff[] = {0, 0, 0, 0, 0};
     uint8_t i;
