@@ -37,7 +37,6 @@
 #include "se-identity.h"
 #include "soft-se-hal.h"
 
-#include "systime.h"
 static SecureElementNvmData_t* SeNvm;
 
 /*
