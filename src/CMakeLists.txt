@@ -226,14 +226,10 @@ elseif(APPLICATION STREQUAL rx-sensi)
 elseif(APPLICATION STREQUAL tx-cw)
 
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/tx-cw)
-    
-elseif(APPLICATION STREQUAL uart)
 
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/uart)
+elseif(APPLICATION STREQUAL system-test)
 
-elseif(APPLICATION STREQUAL timer)
-
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/timer)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/system-test)
 
 elseif(APPLICATION STREQUAL i2c)
 

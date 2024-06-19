@@ -8,11 +8,15 @@
 #include "tremo_uart.h"
 #include "tremo_gpio.h"
 #include "tremo_rcc.h"
+#include "tremo_adc.h"
 #include "tremo_delay.h"
 #include "utilities.h"
 #include "gpio.h"
 #include "uart.h"
 
+#define ADC_GAIN (1.000 + 0.002 * (((*(uint32_t *)0x10002030) & 0x1fe0) >> 5))
+#define ADC_DCO (-0.256 + 0.001 * (((*(uint32_t *)0x10002034) & 0x1ff0) >> 4))
+#define BAT_LOW_LEVEL 1.8
 
 Gpio_t Led1; //PA4
 Gpio_t Led2; //PA5
@@ -75,12 +79,19 @@ void BoardInitMcu() {
 
   delay_init();
 
-  LpmSetOffMode(LPM_UART_TX_ID, DISABLE);
-
   I2cMcuInit(&I2c1, I2C_1, PB_14, PB_15);
   I2cMcuFormat(&I2c1, MODE_I2C, I2C_DUTY_CYCLE_2, true, I2C_ACK_ADD_7_BIT, 100000);
   I2cMcuInit(&I2c2, I2C_2, PC_2, PC_3);
   I2cMcuFormat(&I2c2, MODE_I2C, I2C_DUTY_CYCLE_2, true, I2C_ACK_ADD_7_BIT, 400000);
+
+  rcc_set_adc_clk_source(RCC_ADC_CLK_SOURCE_RCO48M);
+  rcc_enable_peripheral_clk(RCC_PERIPHERAL_ADC, true);
+  adc_enable_vbat31(true);
+  adc_init();
+  adc_config_clock_division(20); //sample frequence 150K
+  adc_config_sample_sequence(0, 15);
+  adc_config_conv_mode(ADC_CONV_MODE_SINGLE);
+  adc_enable(true);
 }
 
 void BoardInitPeriph() {
@@ -88,9 +99,7 @@ void BoardInitPeriph() {
 }
 
 void BoardLowPowerHandler() {
-  __disable_irq( );
-  LpmEnterLowPower( );
-  __enable_irq( );
+  LpmEnterLowPower();
 }
 
 void BoardCriticalSectionBegin(uint32_t *mask) {
@@ -104,7 +113,20 @@ void BoardCriticalSectionEnd(uint32_t *mask) {
 
 void BoardResetMcu() {NVIC_SystemReset();}
 
-uint8_t BoardGetBatteryLevel() {return 0;}
+uint8_t BoardGetBatteryLevel() {
+  uint8_t bat, i;
+  uint16_t data;
+  for(i = 0; i < 3; i++) {
+    adc_start(true);
+    while(!(adc_get_interrupt_status(ADC_ISR_EOC)));
+    data = adc_get_data();
+  }
+  adc_start(false);
+  bat = 
+    (3.06 * ((1.2 / 4096 * data - ADC_DCO) / ADC_GAIN) - BAT_LOW_LEVEL) / 
+    (3.3 - BAT_LOW_LEVEL) * 254;
+  return bat ? bat : 1;
+}
 
 uint32_t BoardGetRandomSeed() {return (EFC->SN_L) ^ (EFC->SN_H);}
 

@@ -49,6 +49,7 @@ list(APPEND ${PROJECT_NAME}_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/drivers/peripheral/src/tremo_spi.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/drivers/peripheral/src/tremo_pwr.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/drivers/peripheral/src/tremo_i2c.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../mcu/asr6601/drivers/peripheral/src/tremo_adc.c"
 )
 
 add_library(${PROJECT_NAME} OBJECT EXCLUDE_FROM_ALL ${${PROJECT_NAME}_SOURCES})
