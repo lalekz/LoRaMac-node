@@ -239,8 +239,4 @@ elseif(APPLICATION STREQUAL i2c)
 
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/i2c)
 
-elseif(APPLICATION STREQUAL eeprom)
-
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps/eeprom)
-
 endif()
