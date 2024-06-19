@@ -446,3 +446,8 @@ uint8_t* SecureElementGetPin( void )
 {
     return SeNvm->Pin;
 }
+
+void SecureElementRandomNumber(uint32_t* number) 
+{
+    *number = randr( 0, 0x01FFFFFF );
+}

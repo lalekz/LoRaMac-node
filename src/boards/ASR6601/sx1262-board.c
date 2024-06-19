@@ -18,7 +18,8 @@ extern Gpio_t LoraRfswVdd;
 uint8_t gPaOptSetting = 0;
 RadioOperatingModes_t operatingMode;
 
-uint16_t SspIO(uint16_t outData) {
+uint16_t SspIO(uint16_t outData) 
+{
     uint32_t status;
     uint8_t read_data = 0;
 
@@ -35,9 +36,13 @@ uint16_t SspIO(uint16_t outData) {
     return read_data;
 }
 
-uint32_t SX126xGetBoardTcxoWakeupTime() {return BOARD_TCXO_WAKEUP_TIME;}
+uint32_t SX126xGetBoardTcxoWakeupTime() 
+{
+    return BOARD_TCXO_WAKEUP_TIME;
+}
 
-void SX126xReset() {
+void SX126xReset() 
+{
     LORAC->CR1 &= ~(1 << 5); // nreset
     delay_us(100);
     LORAC->CR1 |= 1 << 5;    // nreset release
@@ -48,12 +53,14 @@ void SX126xReset() {
     while ((LORAC->SR) & 0x100);
 }
 
-void SX126xWaitOnBusy() {
+void SX126xWaitOnBusy() 
+{
     delay_us(10);
     while ((LORAC->SR) & 0x100);
 }
 
-void SX126xWakeup(void) {
+void SX126xWakeup(void) 
+{
     __disable_irq();
 
     LORAC->NSS_CR = 0;
@@ -71,7 +78,8 @@ void SX126xWakeup(void) {
     __enable_irq();
 }
 
-void SX126xWriteCommand(RadioCommands_t command, uint8_t *buffer, uint16_t size) {
+void SX126xWriteCommand(RadioCommands_t command, uint8_t *buffer, uint16_t size) 
+{
     uint16_t i;
     SX126xCheckDeviceReady();
 
@@ -88,7 +96,8 @@ void SX126xWriteCommand(RadioCommands_t command, uint8_t *buffer, uint16_t size)
         SX126xWaitOnBusy();
 }
 
-uint8_t SX126xReadCommand(RadioCommands_t command, uint8_t *buffer, uint16_t size) {
+uint8_t SX126xReadCommand(RadioCommands_t command, uint8_t *buffer, uint16_t size) 
+{
     uint16_t i;
     SX126xCheckDeviceReady();
 
@@ -105,7 +114,8 @@ uint8_t SX126xReadCommand(RadioCommands_t command, uint8_t *buffer, uint16_t siz
     return 0;
 }
 
-void SX126xWriteRegisters(uint16_t address, uint8_t *buffer, uint16_t size) {
+void SX126xWriteRegisters(uint16_t address, uint8_t *buffer, uint16_t size) 
+{
     uint16_t i;
     SX126xCheckDeviceReady();
 
@@ -123,11 +133,13 @@ void SX126xWriteRegisters(uint16_t address, uint8_t *buffer, uint16_t size) {
     SX126xWaitOnBusy();
 }
 
-void SX126xWriteRegister(uint16_t address, uint8_t value) {
+void SX126xWriteRegister(uint16_t address, uint8_t value) 
+{
     SX126xWriteRegisters(address, &value, 1);
 }
 
-void SX126xReadRegisters(uint16_t address, uint8_t *buffer, uint16_t size) {
+void SX126xReadRegisters(uint16_t address, uint8_t *buffer, uint16_t size) 
+{
     uint16_t i;
     SX126xCheckDeviceReady();
 
@@ -145,13 +157,15 @@ void SX126xReadRegisters(uint16_t address, uint8_t *buffer, uint16_t size) {
     SX126xWaitOnBusy();
 }
 
-uint8_t SX126xReadRegister(uint16_t address) {
+uint8_t SX126xReadRegister(uint16_t address) 
+{
     uint8_t data;
     SX126xReadRegisters(address, &data, 1);
     return data;
 }
 
-void SX126xWriteBuffer(uint8_t offset, uint8_t *buffer, uint8_t size) {
+void SX126xWriteBuffer(uint8_t offset, uint8_t *buffer, uint8_t size) 
+{
     uint8_t i;
     SX126xCheckDeviceReady();
 
@@ -167,7 +181,8 @@ void SX126xWriteBuffer(uint8_t offset, uint8_t *buffer, uint8_t size) {
     SX126xWaitOnBusy();
 }
 
-void SX126xReadBuffer(uint8_t offset, uint8_t *buffer, uint8_t size) {
+void SX126xReadBuffer(uint8_t offset, uint8_t *buffer, uint8_t size) 
+{
     uint8_t i;
     SX126xCheckDeviceReady();
 
@@ -183,32 +198,48 @@ void SX126xReadBuffer(uint8_t offset, uint8_t *buffer, uint8_t size) {
     SX126xWaitOnBusy();
 }
 
-void SX126xSetRfTxPower(int8_t power) { SX126xSetTxParams(power, RADIO_RAMP_40_US); }
+void SX126xSetRfTxPower(int8_t power) 
+{ 
+    SX126xSetTxParams(power, RADIO_RAMP_40_US); 
+}
 
-uint8_t SX126xGetPaSelect(uint32_t channel) { return SX1262; }
+uint8_t SX126xGetPaSelect(uint32_t channel) 
+{ 
+    return SX1262; 
+}
 
-void SX126xAntSwOn() {
+void SX126xAntSwOn() 
+{
     GpioInit(&LoraRfswVdd, PA_10, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_UP, 0);
 }
 
-void SX126xAntSwOff() {
+void SX126xAntSwOff() 
+{
     GpioInit(&LoraRfswVdd, PA_10, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
 }
 
-uint8_t SX126xGetPaOpt() { return gPaOptSetting; }
+uint8_t SX126xGetPaOpt() 
+{ 
+    return gPaOptSetting; 
+}
 
-void SX126xSetPaOpt(uint8_t opt) {
+void SX126xSetPaOpt(uint8_t opt) 
+{
     if (opt > 3)
         return;
     gPaOptSetting = opt;
 }
 
-bool SX126xCheckRfFrequency(uint32_t frequency) {
+bool SX126xCheckRfFrequency(uint32_t frequency) 
+{
     // Implement check. Currently all frequencies are supported
     return true;
 }
 
-uint8_t SX126xGetDeviceId() {return SX1262;}
+uint8_t SX126xGetDeviceId() 
+{
+    return SX1262;
+}
 
 
 uint32_t SX126xGetDio1PinState()
@@ -217,27 +248,31 @@ uint32_t SX126xGetDio1PinState()
     return 0;
 }
 
-void SX126xSetOperatingMode(RadioOperatingModes_t mode) {operatingMode = mode;}
-
-RadioOperatingModes_t SX126xGetOperatingMode() {return operatingMode;}
-
-void SX126xIoTcxoInit() { /*
-    CalibrationParams_t calibParam;
-
-    SX126xSetDio3AsTcxoCtrl( TCXO_CTRL_1_7V, SX126xGetBoardTcxoWakeupTime( ) << 6 ); // convert from ms to SX126x time base
-    calibParam.Value = 0x7F;
-    SX126xCalibrate( calibParam );
-    */
+void SX126xSetOperatingMode(RadioOperatingModes_t mode) 
+{
+    operatingMode = mode;
 }
 
-void SX126xIoRfSwitchInit() {
+RadioOperatingModes_t SX126xGetOperatingMode() 
+{
+    return operatingMode;
+}
+
+void SX126xIoTcxoInit() 
+{
+}
+
+void SX126xIoRfSwitchInit() 
+{
     SX126xSetDio2AsRfSwitchCtrl(true);
 }
 
-void SX126xIoInit() {
+void SX126xIoInit() 
+{
     GpioInit(&LoraRfswCtrl, PD_11, PIN_ALTERNATE_FCT, PIN_PUSH_PULL, PIN_PULL_DOWN, 3);
     GpioInit(&LoraRfswVdd, PA_10, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
 }
 
-void SX126xIoIrqInit(DioIrqHandler dioIrq) {
+void SX126xIoIrqInit(DioIrqHandler dioIrq) 
+{
 }

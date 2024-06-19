@@ -1,11 +1,17 @@
 #include "lpm-board.h" 
 #include "board.h"
 #include "tremo_pwr.h"
+#include "tremo_rtc.h"
+#include "rtc-board.h"
+#include "radio.h"
 
 static uint32_t StopModeDisable = 0;
-static uint32_t OffModeDisable = 0;
+static uint32_t OffModeDisable = 1;
 
-void LpmSetOffMode(LpmId_t id, LpmSetMode_t mode) {
+extern const struct Radio_s Radio;
+
+void LpmSetOffMode(LpmId_t id, LpmSetMode_t mode) 
+{
     CRITICAL_SECTION_BEGIN();
     switch(mode) {
         case LPM_DISABLE:
@@ -20,7 +26,8 @@ void LpmSetOffMode(LpmId_t id, LpmSetMode_t mode) {
     CRITICAL_SECTION_END();
 }
 
-void LpmSetStopMode(LpmId_t id, LpmSetMode_t mode) {
+void LpmSetStopMode(LpmId_t id, LpmSetMode_t mode) 
+{
     CRITICAL_SECTION_BEGIN();
     switch( mode ) {
         case LPM_DISABLE:
@@ -36,7 +43,8 @@ void LpmSetStopMode(LpmId_t id, LpmSetMode_t mode) {
     return;
 }
 
-void LpmEnterLowPower() {
+void LpmEnterLowPower() 
+{
     if( StopModeDisable != 0 ) {
         /*!
         * SLEEP mode is required
@@ -62,23 +70,29 @@ void LpmEnterLowPower() {
     }
 }
 
-void LpmEnterSleepMode() {
-    pwr_sleep_wfe(1);
+void LpmEnterSleepMode() 
+{
 }
 
-void LpmExitSleepMode() {
-    pwr_exit_lprun_mode();
+void LpmExitSleepMode() 
+{
 }
 
-void LpmEnterStopMode() {
-    pwr_deepsleep_wfe(PWR_LP_MODE_STOP0);
+void LpmEnterStopMode() 
+{
+    if(Radio.GetStatus() != RF_IDLE)
+        return;
+    
+    rtc_check_syn();
+    pwr_deepsleep_wfi(PWR_LP_MODE_STOP3);
 }
 
-void LpmExitStopMode() {
+void LpmExitStopMode() 
+{
 }
 
-void LpmEnterOffMode() {
-    pwr_deepsleep_wfe(PWR_LP_MODE_STANDBY);
+void LpmEnterOffMode() 
+{
 }
 
 void LpmExitOffMode()

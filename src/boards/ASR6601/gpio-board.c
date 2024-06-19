@@ -1,13 +1,11 @@
 #include "gpio-board.h"
 #include "tremo_gpio.h"
 #include "tremo_rcc.h"
-//ACHTUNG
-//NO SUPPORT FOR AF
-//BSR IS ACTUALLY BSRR
 
 gpio_t* get_gpio_address(uint8_t port_index) {return (gpio_t*)(GPIO_BASE + port_index * 0x400);}
 
-void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, PinTypes type, uint32_t value) {
+void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, PinTypes type, uint32_t value) 
+{
   
   uint16_t port_index = pin / 16;
   uint16_t pin_index = pin % 16;
@@ -18,7 +16,6 @@ void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, Pi
   obj->port = port;
   obj->pin = pin;
   obj->pull = type;
-  
   if(!(RCC->CGR0 & (RCC_CGR0_IOM0_CLK_EN_MASK >> port_index)))
     RCC->CGR0 |= (RCC_CGR0_IOM0_CLK_EN_MASK >> port_index);
   
@@ -28,7 +25,7 @@ void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, Pi
       
       break;
     case PIN_OUTPUT:
-      port->OER |= 1 << pin_index;
+      port->OER &= ~(1 << pin_index);
       break;
 
     case PIN_ALTERNATE_FCT:
@@ -40,7 +37,6 @@ void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, Pi
         port->PER &= ~(1 << pin_index);
       break;
   }
-
   switch(config) {
     case PIN_PUSH_PULL:
       break;
@@ -62,14 +58,17 @@ void GpioMcuInit(Gpio_t *obj, PinNames pin, PinModes mode, PinConfigs config, Pi
   }
 }
 
-void GpioMcuToggle(Gpio_t *obj) {
+void GpioMcuToggle(Gpio_t *obj) 
+{
   gpio_toggle(get_gpio_address(obj->portIndex), obj->pinIndex);
 }
 
-void GpioMcuWrite(Gpio_t *obj, uint32_t value) {
+void GpioMcuWrite(Gpio_t *obj, uint32_t value) 
+{
   gpio_write(get_gpio_address(obj->portIndex), obj->pinIndex, value ? GPIO_LEVEL_HIGH : GPIO_LEVEL_LOW);
 }
 
-uint32_t GpioMcuRead(Gpio_t *obj) {
+uint32_t GpioMcuRead(Gpio_t *obj) 
+{
   return (uint32_t)gpio_read(get_gpio_address(obj->portIndex), obj->pinIndex);
 }

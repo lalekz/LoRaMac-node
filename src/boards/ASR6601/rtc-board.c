@@ -9,6 +9,9 @@
 
 #define MINIMAL_TIMEOUT 5
 #define TICKS_PER_SECOND 32768
+
+
+uint32_t backup_data_0, backup_data_1;
 /*!
  * Number of seconds in a minute
  */
@@ -52,7 +55,8 @@ static const uint8_t DaysInMonthLeapYear[] = { 31, 29, 31, 30, 31, 30, 31, 31, 3
 /*!
  * RTC timer context
  */
-typedef struct RtcCalendar_s {
+typedef struct RtcCalendar_s 
+{
     rtc_calendar_t CalendarTime;
 } RtcCalendar_t;
 
@@ -89,7 +93,8 @@ static RtcCalendar_t RtcGetCalendar();
 
 extern void rtc_check_syn();
 
-void RtcInit() {
+void RtcInit() 
+{
     rcc_enable_peripheral_clk(RCC_PERIPHERAL_AFEC, true);
     rcc_enable_oscillator(RCC_OSC_XO32K, true);
     rcc_enable_peripheral_clk(RCC_PERIPHERAL_RTC, true);
@@ -98,24 +103,28 @@ void RtcInit() {
     NVIC_EnableIRQ(RTC_IRQn);
 }
 
-uint32_t RtcGetMinimumTimeout() {
+uint32_t RtcGetMinimumTimeout() 
+{
     return MINIMAL_TIMEOUT;
 }
 
-uint32_t RtcMs2Tick(TimerTime_t milliseconds) {
+uint32_t RtcMs2Tick(TimerTime_t milliseconds) 
+{
     return (uint32_t) round(((double)milliseconds) * TICKS_PER_SECOND / 1000);
 }
 
 
-TimerTime_t RtcTick2Ms(uint32_t tick) {
+TimerTime_t RtcTick2Ms(uint32_t tick) 
+{
     return (uint32_t) round((double) tick / TICKS_PER_SECOND * 1000);
 }
 
-void RtcDelayMs(TimerTime_t milliseconds) {
-    //!!!
+void RtcDelayMs(TimerTime_t milliseconds)
+{
 }
 
-void RtcSetAlarm(uint32_t timeout) {
+void RtcSetAlarm(uint32_t timeout) 
+{
     RtcCalendar_t now;
     if(timeout <= MINIMAL_TIMEOUT)
         timeout = MINIMAL_TIMEOUT;
@@ -134,35 +143,48 @@ void RtcSetAlarm(uint32_t timeout) {
 }
 
 
-void RtcStopAlarm() {
+void RtcStopAlarm() 
+{
     rtc_cyc_cmd(DISABLE);
     rtc_config_interrupt(RTC_CYC_IT, DISABLE);
 }
 
-void RtcStartAlarm(uint32_t timeout) {
+void RtcStartAlarm(uint32_t timeout) 
+{
     RtcSetAlarm(timeout);
     
 }
 
-TimerTime_t RtcSetTimerContext() {
+TimerTime_t RtcSetTimerContext() 
+{
     RtcTimerContext = RtcConvertCalendarTickToTimerTime(NULL);
     return RtcTimerContext;
 }
 
-TimerTime_t RtcGetTimerContext() {return RtcTimerContext;}
-
-uint32_t RtcGetCalendarTime(uint16_t* milliseconds) {
-    *(milliseconds) = RtcConvertCalendarTickToTimerTime(NULL);
-    return *(milliseconds) / 1000;
+TimerTime_t RtcGetTimerContext() 
+{
+    return RtcTimerContext;
 }
 
-TimerTime_t RtcGetTimerValue() {return RtcConvertCalendarTickToTimerTime(NULL);}
+uint32_t RtcGetCalendarTime(uint16_t* milliseconds) 
+{
+    uint32_t ms = RtcConvertCalendarTickToTimerTime(NULL);
+    *(milliseconds) = ms % 1000; 
+    return ms / 1000;
+}
 
-uint32_t RtcGetTimerElapsedTime() {
+TimerTime_t RtcGetTimerValue() 
+{
+    return RtcMs2Tick(RtcConvertCalendarTickToTimerTime(NULL));
+}
+
+uint32_t RtcGetTimerElapsedTime() 
+{
     return RtcConvertCalendarTickToTimerTime(NULL) - RtcTimerContext;
 }
 
-static TimerTime_t RtcConvertCalendarTickToTimerTime(RtcCalendar_t *calendar) {
+static TimerTime_t RtcConvertCalendarTickToTimerTime(RtcCalendar_t *calendar) 
+{
     TimerTime_t timeCounter = 0;
     RtcCalendar_t now;
     TimerTime_t timeCounterTemp = 0;
@@ -202,7 +224,8 @@ static TimerTime_t RtcConvertCalendarTickToTimerTime(RtcCalendar_t *calendar) {
     return timeCounter;
 }
 
-static RtcCalendar_t RtcGetCalendar() {
+static RtcCalendar_t RtcGetCalendar() 
+{
     RtcCalendar_t now;
     rtc_get_calendar(&now.CalendarTime);
     return now;
@@ -213,7 +236,8 @@ void RtcProcess()
     // Not used on this platform.
 }
 
-void RtcOnIrq(void) {
+void RtcOnIrq(void) 
+{
     if (rtc_get_status(RTC_CYC_SR)) {
         rtc_config_interrupt(RTC_CYC_IT, DISABLE);
         rtc_set_status(RTC_CYC_SR, false);
@@ -222,3 +246,49 @@ void RtcOnIrq(void) {
     }
 }
 
+TimerTime_t RtcTempCompensation( TimerTime_t period, float temperature )
+{
+    float k = RTC_TEMP_COEFFICIENT;
+    float kDev = RTC_TEMP_DEV_COEFFICIENT;
+    float t = RTC_TEMP_TURNOVER;
+    float tDev = RTC_TEMP_DEV_TURNOVER;
+    float interim = 0.0f;
+    float ppm = 0.0f;
+
+    if( k < 0.0f )
+    {
+        ppm = ( k - kDev );
+    }
+    else
+    {
+        ppm = ( k + kDev );
+    }
+    interim = ( temperature - ( t - tDev ) );
+    ppm *=  interim * interim;
+
+    // Calculate the drift in time
+    interim = ( ( float ) period * ppm ) / 1000000.0f;
+    // Calculate the resulting time period
+    interim += period;
+    interim = floor( interim );
+
+    if( interim < 0.0f )
+    {
+        interim = ( float )period;
+    }
+
+    // Calculate the resulting period
+    return ( TimerTime_t ) interim;
+}
+
+void RtcBkupWrite( uint32_t data0, uint32_t data1 )
+{
+    backup_data_0 = data0;
+    backup_data_1 = data1;
+}
+
+void RtcBkupRead( uint32_t *data0, uint32_t *data1 )
+{
+    *data0 = backup_data_0;
+    *data1 = backup_data_1;
+}
