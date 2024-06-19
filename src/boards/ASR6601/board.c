@@ -30,7 +30,8 @@ Spi_t Spi1; //PB10 PB11 PB8 PB9
 I2c_t I2c1; //PB14 PB15s
 I2c_t I2c2; //PC2 PC3
 
-void LoracInit() {
+void LoracInit() 
+{
     rcc_enable_peripheral_clk(RCC_PERIPHERAL_LORA, false);
     rcc_rst_peripheral(RCC_PERIPHERAL_LORA, true);
     rcc_rst_peripheral(RCC_PERIPHERAL_LORA, false);
@@ -57,7 +58,8 @@ void LoracInit() {
     SX126xIoInit();
 }
 
-void BoardInitMcu() {  
+void BoardInitMcu() 
+{  
 
   GpioInit(&Led1, PA_4, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
   GpioInit(&Led2, PA_5, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_DOWN, 0);
@@ -94,26 +96,34 @@ void BoardInitMcu() {
   adc_enable(true);
 }
 
-void BoardInitPeriph() {
+void BoardInitPeriph() 
+{
  // not used
 }
 
-void BoardLowPowerHandler() {
+void BoardLowPowerHandler() 
+{
   LpmEnterLowPower();
 }
 
-void BoardCriticalSectionBegin(uint32_t *mask) {
+void BoardCriticalSectionBegin(uint32_t *mask) 
+{
   *mask = __get_PRIMASK( );
   __disable_irq( );
 }
 
-void BoardCriticalSectionEnd(uint32_t *mask) {
+void BoardCriticalSectionEnd(uint32_t *mask) 
+{
   __set_PRIMASK( *mask );
 }
 
-void BoardResetMcu() {NVIC_SystemReset();}
+void BoardResetMcu() 
+{
+  NVIC_SystemReset();
+}
 
-uint8_t BoardGetBatteryLevel() {
+uint8_t BoardGetBatteryLevel() 
+{
   uint8_t bat, i;
   uint16_t data;
   for(i = 0; i < 3; i++) {
@@ -128,9 +138,13 @@ uint8_t BoardGetBatteryLevel() {
   return bat ? bat : 1;
 }
 
-uint32_t BoardGetRandomSeed() {return (EFC->SN_L) ^ (EFC->SN_H);}
+uint32_t BoardGetRandomSeed() 
+{
+  return (EFC->SN_L) ^ (EFC->SN_H);
+}
 
-void BoardGetUniqueId(uint8_t *id) {
+void BoardGetUniqueId(uint8_t *id) 
+{
   uint32_t snl = EFC->SN_L;
   uint32_t snh = EFC->SN_H;
   id[7] = (snl + snl) >> 24;

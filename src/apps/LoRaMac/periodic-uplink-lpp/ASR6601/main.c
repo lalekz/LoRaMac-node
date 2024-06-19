@@ -42,7 +42,7 @@
 #include "i2c-board.h"
 #ifndef ACTIVE_REGION
 
-#warning "No active region defined, LORAMAC_REGION_EU868 will be used as default."
+#warning "No active region defined, LORAMAC_REGION_RU864 will be used as default."
 
 #define ACTIVE_REGION LORAMAC_REGION_RU864
 
